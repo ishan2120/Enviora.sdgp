@@ -7,7 +7,7 @@ void main() {
     await tester.pumpWidget(const EnvioraApp());
     await tester.pump();
 
-    // The app should launch and show the Profile screen
-    expect(find.text('Profile'), findsOneWidget);
+    // The app should launch and show the Welcome screen
+    expect(find.text('Get Started'), findsOneWidget);
   });
 }
