@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../profile_screen.dart';
+import 'dashboard.dart';
 
 // Supported language model
 class AppLanguage {
@@ -60,7 +60,7 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage> {
     );
     widget.onLanguageSelected(Locale(selected.code));
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const ProfileScreen()),
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
     );
   }
 
@@ -183,6 +183,8 @@ class _HeroBanner extends StatelessWidget {
             child: Image.asset(
               'assets/images/Rectangle 118.png',
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+                  Container(color: Colors.green.shade800),
             ),
           ),
           // Dark gradient overlay

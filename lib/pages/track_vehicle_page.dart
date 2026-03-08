@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../models/models.dart';
+import '../widgets/custom_bottom_nav.dart';
 import 'file_complaint_page.dart';
 
 class TrackVehiclePage extends StatefulWidget {
@@ -73,6 +74,7 @@ class _TrackVehiclePageState extends State<TrackVehiclePage> {
           ),
         ],
       ),
+      bottomNavigationBar: const CustomBottomNavBar(currentIndex: 2),
       body: Column(
         children: [
           // Map Section
@@ -214,7 +216,7 @@ class _TrackVehiclePageState extends State<TrackVehiclePage> {
                     const BorderRadius.vertical(top: Radius.circular(20)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withValues(alpha: 0.1),
+                    color: Colors.grey.withOpacity(0.1),
                     spreadRadius: 1,
                     blurRadius: 10,
                     offset: const Offset(0, -2),
@@ -475,7 +477,7 @@ class _MapControlButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.3),
+            color: Colors.grey.withOpacity(0.3),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
