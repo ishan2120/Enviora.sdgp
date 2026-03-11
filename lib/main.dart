@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'pages/language_selection_page.dart';
+import 'pages/welcome_page.dart';
+import 'pages/login_page.dart';
+import 'pages/register_page.dart';
 
 void main() {
   runApp(const EnvioraApp());
@@ -38,7 +41,14 @@ class _EnvioraAppState extends State<EnvioraApp> {
         useMaterial3: true,
         fontFamily: 'Roboto',
       ),
-      home: LanguageSelectionPage(onLanguageSelected: _setLocale),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const WelcomePage(),
+        '/login': (context) => const LoginPage(),
+        '/register': (context) => const RegisterPage(),
+        '/language': (context) =>
+            LanguageSelectionPage(onLanguageSelected: _setLocale),
+      },
     );
   }
 }

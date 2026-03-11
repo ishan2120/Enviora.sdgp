@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:enviora_profile/profile_screen.dart'; // Assuming package name from pubspec.yaml
+import 'package:enviora_profile/pages/profile_screen.dart'; // Assuming package name from pubspec.yaml
 
 void main() {
   // Helper to pump the widget
