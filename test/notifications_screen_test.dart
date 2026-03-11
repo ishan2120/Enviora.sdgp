@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:enviora_profile/notifications_screen.dart';
+import 'package:enviora_profile/pages/notifications_screen.dart';
 
 void main() {
   testWidgets('Notifications Screen renders correctly',

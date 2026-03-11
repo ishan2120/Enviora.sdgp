@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:enviora_profile/edit_profile_screen.dart';
+import 'package:enviora_profile/pages/edit_profile_screen.dart';
 
 void main() {
   testWidgets('Edit Profile Screen renders correctly',

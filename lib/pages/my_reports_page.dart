@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../widgets/custom_bottom_nav.dart';
 import '../models/models.dart';
 import 'file_complaint_page.dart';
-import 'track_vehicle_page.dart';
-import '../profile_screen.dart';
 
 class MyReportsPage extends StatefulWidget {
   const MyReportsPage({super.key});
@@ -16,7 +15,6 @@ class _MyReportsPageState extends State<MyReportsPage> {
   ReportStatus? _selectedFilter;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  int _currentNavIndex = 0;
 
   // Sample data - In a real app, this would come from a backend
   final List<Report> _allReports = [
@@ -91,7 +89,7 @@ class _MyReportsPageState extends State<MyReportsPage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {},
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'My Reports',
@@ -214,44 +212,7 @@ class _MyReportsPageState extends State<MyReportsPage> {
         backgroundColor: const Color(0xFF4CAF50),
         child: const Icon(Icons.add, size: 32),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFF4CAF50),
-        unselectedItemColor: Colors.grey,
-        currentIndex: _currentNavIndex,
-        onTap: (index) {
-          setState(() {
-            _currentNavIndex = index;
-          });
-          if (index == 2) {
-            // Navigate to Track Vehicle page
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const TrackVehiclePage(),
-              ),
-            );
-          } else if (index == 3) {
-            // Navigate to Profile page
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    const ProfileScreen(), // Assuming ProfileScreen is imported
-              ),
-            );
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'HOME'),
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'GUIDE'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.location_on),
-            label: 'TRACK',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'PROFILE'),
-        ],
-      ),
+      bottomNavigationBar: const CustomBottomNavBar(currentIndex: -1),
     );
   }
 }
@@ -331,7 +292,7 @@ class _ReportCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
+            color: Colors.grey.withOpacity(0.1),
             spreadRadius: 1,
             blurRadius: 8,
             offset: const Offset(0, 2),
@@ -428,6 +389,10 @@ class _ReportCard extends StatelessWidget {
                     child: Image.asset(
                       report.imageUrl!,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(_getReportIcon(),
+                            size: 40, color: Colors.grey[600]);
+                      },
                     ),
                   )
                 : Icon(_getReportIcon(), size: 40, color: Colors.grey[600]),
