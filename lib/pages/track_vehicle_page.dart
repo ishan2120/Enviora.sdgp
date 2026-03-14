@@ -16,7 +16,7 @@ class _TrackVehiclePageState extends State<TrackVehiclePage> {
   bool _notifyWhenNear = true;
   final MapController _mapController = MapController();
 
-  // Sample vehicle data - In a real app, this would come from a backend/GPS service
+  // Sample vehicle data 
   final VehicleLocation _vehicleData = VehicleLocation(
     vehicleId: '#402',
     latitude: 37.7749,
