@@ -94,7 +94,7 @@ class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
               ),
             ),
 
-            SizedBox(height: 16),
+            SizedBox(height: 19),
 
             // Week days row
             SizedBox(
@@ -125,8 +125,9 @@ class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
                         horizontal: 12,
                       ),
                       decoration: BoxDecoration(
-                        color:
-                            isSelected ? Colors.green.shade100 : Colors.white,
+                        color: isSelected
+                            ? Colors.green.shade100
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Column(
