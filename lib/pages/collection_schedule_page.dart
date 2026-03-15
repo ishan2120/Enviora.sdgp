@@ -5,6 +5,7 @@ void main() {
   runApp(CollectionApp());
 }
 
+// display the weekly collection schedule
 class CollectionApp extends StatelessWidget {
   const CollectionApp({super.key});
 
