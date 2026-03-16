@@ -11,7 +11,7 @@ import 'package:http/http.dart' as http;
 // ─────────────────────────────────────────────────────────────
 // CHANGE THIS to your computer's IP address (from ipconfig)
 // ─────────────────────────────────────────────────────────────
-const String _baseUrl   = 'http:/10.31.19.103:3000/api';
+const String _baseUrl   = 'http:/1192.168.1.23:3000/api';
 const String _vehicleId = 'truck-402';
 const String _userId    = 'user-123';
 
