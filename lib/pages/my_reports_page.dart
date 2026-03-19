@@ -16,7 +16,7 @@ class _MyReportsPageState extends State<MyReportsPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  // Sample data - In a real app, this would come from a backend
+  // Sample data
   final List<Report> _allReports = [
     Report(
       id: 'EV-7712',
