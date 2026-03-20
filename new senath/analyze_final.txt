@@ -1,0 +1,186 @@
+Resolving dependencies...
+Downloading packages...
+  characters 1.4.0 (1.4.1 available)
+  flutter_lints 2.0.3 (6.0.0 available)
+  flutter_map 7.0.2 (8.2.2 available)
+  intl 0.19.0 (0.20.2 available)
+  lints 2.1.1 (6.1.0 available)
+  logger 2.6.2 (2.7.0 available)
+  matcher 0.12.17 (0.12.19 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.17.0 (1.18.2 available)
+  mgrs_dart 2.0.0 (3.0.0 available)
+  proj4dart 2.1.0 (3.0.0 available)
+  test_api 0.7.7 (0.7.10 available)
+  unicode 0.3.1 (1.1.9 available)
+Got dependencies!
+13 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing Enviora.sdgp...                                       
+
+  error - Target of URI doesn't exist: 'package:device_preview/device_preview.dart' - enviora\lib\main.dart:3:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: 'login_page.dart' - enviora\lib\main.dart:5:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: 'welcome_page.dart' - enviora\lib\main.dart:6:8 - uri_does_not_exist
+  error - The function 'DevicePreview' isn't defined - enviora\lib\main.dart:10:5 - undefined_function
+  error - The name 'WelcomePage' isn't a class - enviora\lib\main.dart:27:33 - creation_with_non_type
+  error - The name 'LoginPage' isn't a class - enviora\lib\main.dart:28:38 - creation_with_non_type
+  error - Target of URI doesn't exist: 'package:enviora/main.dart' - enviora\test\widget_test.dart:2:8 - uri_does_not_exist
+  error - The name 'EnvioraApp' isn't a class - enviora\test\widget_test.dart:7:35 - creation_with_non_type
+  error - Target of URI doesn't exist: '../profile_screen.dart' - lib\language_selection_page.dart:2:8 - uri_does_not_exist
+  error - The name 'ProfileScreen' isn't a class - lib\language_selection_page.dart:63:47 - creation_with_non_type
+  error - Target of URI doesn't exist: 'pages/login_page.dart' - lib\main.dart:4:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: 'pages/register_page.dart' - lib\main.dart:5:8 - uri_does_not_exist
+  error - The name 'LoginPage' isn't a class - lib\main.dart:47:38 - creation_with_non_type
+  error - The name 'RegisterPage' isn't a class - lib\main.dart:48:41 - creation_with_non_type
+  error - Target of URI doesn't exist: '../profile_screen.dart' - lib\my_reports_page.dart:6:8 - uri_does_not_exist
+  error - The name 'ProfileScreen' isn't a class - lib\my_reports_page.dart:240:27 - creation_with_non_type
+   info - Use 'const' with the constructor to improve performance - lib\pages\activity_history_screen.dart:203:11 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\activity_history_screen.dart:204:20 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\activity_history_screen.dart:310:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\activity_history_screen.dart:393:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\activity_history_screen.dart:427:59 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:5:10 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:13:12 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:15:13 - prefer_const_constructors
+   info - Invalid use of a private type in a public API - lib\pages\collection_schedule_page.dart:24:3 - library_private_types_in_public_api
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:33:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:51:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:54:31 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:68:23 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:70:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:77:32 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:83:30 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:88:32 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:90:30 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:97:13 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:122:31 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:123:32 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:136:27 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:173:13 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:176:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:177:23 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:182:22 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\pages\collection_schedule_page.dart:184:27 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:185:19 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:186:19 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:187:19 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:192:13 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:203:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:206:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:219:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:220:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:228:11 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:235:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:237:17 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:238:39 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\collection_schedule_page.dart:243:22 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\collection_schedule_page.dart:245:34 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\pages\dashboard.dart:55:19 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\dashboard.dart:56:28 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\pages\dashboard.dart:58:33 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\pages\dashboard.dart:88:28 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\pages\dashboard.dart:89:33 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\pages\dashboard.dart:168:27 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\pages\dashboard.dart:170:39 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\pages\dashboard.dart:171:31 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\pages\dashboard.dart:173:43 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\pages\dashboard.dart:206:27 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\pages\dashboard.dart:208:39 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\pages\dashboard.dart:244:38 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\pages\dashboard.dart:245:43 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\pages\dashboard.dart:368:27 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\dashboard.dart:369:36 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\pages\dashboard.dart:371:41 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\pages\dashboard.dart:433:27 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\dashboard.dart:434:36 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\pages\dashboard.dart:436:41 - prefer_const_literals_to_create_immutables
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\dashboard.dart:494:41 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\pages\edit_profile_screen.dart:101:31 - curly_braces_in_flow_control_structures
+   info - Use 'const' with the constructor to improve performance - lib\pages\edit_profile_screen.dart:212:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\edit_profile_screen.dart:213:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\edit_profile_screen.dart:214:26 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\edit_profile_screen.dart:297:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\my_reports_page.dart:295:32 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\pages\notifications_screen.dart:162:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\notifications_screen.dart:163:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\notifications_screen.dart:164:26 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\profile_screen.dart:130:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\profile_screen.dart:234:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\profile_screen.dart:286:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\profile_screen.dart:331:33 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\pages\segregation_guide.dart:21:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\segregation_guide.dart:27:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\segregation_guide.dart:33:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\segregation_guide.dart:39:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\segregation_guide.dart:45:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\segregation_guide.dart:51:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\segregation_guide.dart:99:22 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\pages\segregation_guide.dart:101:27 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\pages\segregation_guide.dart:291:30 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\pages\segregation_guide.dart:293:35 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\pages\segregation_guide.dart:300:27 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\segregation_guide.dart:301:36 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\pages\segregation_guide.dart:303:41 - prefer_const_literals_to_create_immutables
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\segregation_guide.dart:368:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\segregation_guide.dart:409:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\segregation_guide.dart:433:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\track_vehicle_page.dart:219:40 - deprecated_member_use
+   info - 'activeColor' is deprecated and shouldn't be used. Use activeThumbColor instead. This feature was deprecated after v3.31.0-2.0.pre - lib\pages\track_vehicle_page.dart:413:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\track_vehicle_page.dart:480:32 - deprecated_member_use
+  error - Target of URI doesn't exist: 'login_page.dart' - lib\pages\welcome_page.dart:2:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: 'register_page.dart' - lib\pages\welcome_page.dart:3:8 - uri_does_not_exist
+   info - Use 'const' with the constructor to improve performance - lib\pages\welcome_page.dart:19:27 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\welcome_page.dart:20:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\welcome_page.dart:21:26 - prefer_const_constructors
+   info - Use a 'SizedBox' to add whitespace to a layout - lib\pages\welcome_page.dart:28:11 - sized_box_for_whitespace
+   info - Use 'const' with the constructor to improve performance - lib\pages\welcome_page.dart:121:9 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\welcome_page.dart:150:33 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\pages\welcome_page.dart:168:31 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\pages\welcome_page.dart:169:31 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\pages\welcome_page.dart:172:31 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\pages\welcome_page.dart:178:26 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\welcome_page.dart:198:61 - deprecated_member_use
+  error - The name 'LoginPage' isn't a class - lib\pages\welcome_page.dart:236:59 - creation_with_non_type
+   info - Use 'const' with the constructor to improve performance - lib\pages\welcome_page.dart:247:16 - prefer_const_constructors
+  error - The name 'RegisterPage' isn't a class - lib\pages\welcome_page.dart:275:61 - creation_with_non_type
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\dashboard.dart:40:19 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\dashboard.dart:41:28 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\home\dashboard.dart:43:33 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\dashboard.dart:72:28 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\home\dashboard.dart:73:33 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\dashboard.dart:143:27 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\home\dashboard.dart:145:39 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\dashboard.dart:146:31 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\home\dashboard.dart:148:43 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\dashboard.dart:181:27 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\home\dashboard.dart:183:39 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\dashboard.dart:211:36 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\home\dashboard.dart:212:41 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\dashboard.dart:312:27 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\dashboard.dart:313:36 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\home\dashboard.dart:315:41 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\dashboard.dart:377:27 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\dashboard.dart:378:36 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\home\dashboard.dart:380:41 - prefer_const_literals_to_create_immutables
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\dashboard.dart:418:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\dashboard.dart:484:39 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\segregation_guide.dart:20:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\segregation_guide.dart:26:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\segregation_guide.dart:32:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\segregation_guide.dart:38:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\segregation_guide.dart:44:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\segregation_guide.dart:50:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\segregation_guide.dart:98:22 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\home\segregation_guide.dart:100:27 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\segregation_guide.dart:289:30 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\home\segregation_guide.dart:291:35 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\segregation_guide.dart:298:27 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\home\segregation_guide.dart:299:36 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\screens\home\segregation_guide.dart:301:41 - prefer_const_literals_to_create_immutables
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\segregation_guide.dart:340:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\segregation_guide.dart:421:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\segregation_guide.dart:462:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home\segregation_guide.dart:486:36 - deprecated_member_use
+   info - 'activeColor' is deprecated and shouldn't be used. Use activeThumbColor instead. This feature was deprecated after v3.31.0-2.0.pre - lib\track_vehicle_page.dart:411:31 - deprecated_member_use
+warning - The value of the local variable 'profileIconFinder' isn't used - test\profile_screen_test.dart:67:11 - unused_local_variable
+
