@@ -56,6 +56,7 @@ class HomeScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+<<<<<<< Updated upstream
                         const Text(
                           'GOOD MORNING',
                           style: TextStyle(
@@ -65,6 +66,22 @@ class HomeScreen extends StatelessWidget {
                             letterSpacing: 0.5,
                           ),
                         ),
+=======
+                        Text(
+  () {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'GOOD MORNING';
+    if (hour < 17) return 'GOOD AFTERNOON';
+    return 'GOOD EVENING';
+  }(),
+  style: const TextStyle(
+    fontSize: 10,
+    fontWeight: FontWeight.w500,
+    color: Color(0xFF666666),
+    letterSpacing: 0.5,
+  ),
+),
+>>>>>>> Stashed changes
                         const SizedBox(height: 2),
                         const Text(
                           'Kisanda',
