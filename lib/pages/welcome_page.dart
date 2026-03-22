@@ -73,7 +73,7 @@ class WelcomePage extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
 
                       // Remove pagination dots here as requested
                       const SizedBox(height: 32),
