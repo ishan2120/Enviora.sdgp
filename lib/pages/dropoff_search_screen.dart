@@ -606,7 +606,7 @@ class _LocationEntryScreenState extends State<LocationEntryScreen> {
       markers: _markers,
       myLocationEnabled: true,
       myLocationButtonEnabled: true,
-      mapType: MapType.normal,
+      mapType: 
     );
   }
 
