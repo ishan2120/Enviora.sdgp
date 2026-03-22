@@ -645,7 +645,7 @@ class _LocationEntryScreenState extends State<LocationEntryScreen> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       itemCount: _filteredLocations.length,
       itemBuilder: (context, index) {
         final center = _filteredLocations[index];
