@@ -51,7 +51,7 @@ class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
       });
     }
   }
-
+/// Returns only the schedule items that match the currently selected date.
   List<ScheduleItem> get _filteredSchedule {
     final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDate);
     return _fullSchedule.where((s) => s.date == dateStr).toList();
