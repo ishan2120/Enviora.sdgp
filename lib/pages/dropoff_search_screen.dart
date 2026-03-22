@@ -657,7 +657,7 @@ class _LocationEntryScreenState extends State<LocationEntryScreen> {
             borderRadius: BorderRadius.circular(16),
             side: BorderSide(color: Colors.green.shade200.withOpacity(0.5), width: 1), 
           ),
-          color: Colors.white, 
+          color: Colors., 
           child: InkWell( 
             onTap: () {
               if (center['latitude'] != null) {
