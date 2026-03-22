@@ -147,6 +147,7 @@ class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
                         horizontal: 12,
                       ),
                       decoration: BoxDecoration(
+                        // Highlight the selected day with a green tint
                         color: isSelected ? Colors.green.shade100 : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         border: isSelected ? Border.all(color: Colors.green) : null,
