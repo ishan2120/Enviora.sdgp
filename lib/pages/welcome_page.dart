@@ -258,3 +258,32 @@ class WelcomePage extends StatelessWidget {
     );
   }
 
+  Widget _buildLoginLink(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text(
+          'Don\'t have an account? ',
+          style: TextStyle(fontSize: 14, color: Color(0xFF384132)),
+        ),
+        GestureDetector(
+          onTap: () {
+            // Navigate to register screen
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const RegisterPage()),
+            );
+          },
+          child: const Text(
+            'Register',
+            style: TextStyle(
+              fontSize: 14,
+              color: Color(0xFF384132),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
