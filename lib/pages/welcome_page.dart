@@ -76,7 +76,6 @@ class WelcomePage extends StatelessWidget {
                       const SizedBox(height: 24),
 
                       // Remove pagination dots here as requested
-
                       const SizedBox(height: 32),
 
                       // Get Started button
@@ -115,20 +114,7 @@ class WelcomePage extends StatelessWidget {
                 const Icon(Icons.park, size: 40, color: Colors.green),
           ),
         ),
-        const SizedBox(width: 8),
-        // App name and tagline
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
-              'Enviora',
-              style: TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF384132),
-                fontFamily: 'Lisu Bosa',
-              ),
-            ),
+  
             Text(
               'Your route to a cleaner city',
               style: TextStyle(fontSize: 10, color: Color(0xFF384132)),
@@ -194,7 +180,10 @@ class WelcomePage extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black.withValues(alpha: 0.2)],
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.2),
+                  ],
                 ),
               ),
             ),
@@ -214,8 +203,9 @@ class WelcomePage extends StatelessWidget {
           width: index == 0 ? 24 : 8,
           height: 8,
           decoration: BoxDecoration(
-            color:
-                index == 0 ? const Color(0xFF66BB6A) : const Color(0xFFB2DFDB),
+            color: index == 0
+                ? const Color(0xFF66BB6A)
+                : const Color(0xFFB2DFDB),
             borderRadius: BorderRadius.circular(4),
           ),
         ),
