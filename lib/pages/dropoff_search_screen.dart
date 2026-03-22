@@ -593,7 +593,7 @@ class _LocationEntryScreenState extends State<LocationEntryScreen> {
     if (_filteredLocations.isNotEmpty && _filteredLocations.first['latitude'] != null) {
       initialPos = LatLng(
         (_filteredLocations.first['latitude'] as num).toDouble(),
-        (_filteredLocations.first['longitude'] as num).
+        (_filteredLocations.first['longitude'] as num).toDouble()
       );
     }
 
