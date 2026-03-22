@@ -81,7 +81,7 @@ class WelcomePage extends StatelessWidget {
                       // Get Started button
                       _buildGetStartedButton(context),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 10),
 
                       // Login link
                       _buildLoginLink(context),
