@@ -511,7 +511,7 @@ class _LocationEntryScreenState extends State<LocationEntryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: , 
+      backgroundColor: const Color(0xFFF4FAF5), 
       appBar: AppBar(
         title: Text(
           '${widget.categoryName} Drop-off',
