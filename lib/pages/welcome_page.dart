@@ -111,7 +111,7 @@ class WelcomePage extends StatelessWidget {
             height: 40,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) =>
-                const Icon(Icons.park, size: 20, color: Colors.green),
+                const Icon(Icons.park, size: 40, color: Colors.green),
           ),
         ),
         const SizedBox(width: 8),
