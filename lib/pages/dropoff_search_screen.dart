@@ -486,7 +486,7 @@ class _LocationEntryScreenState extends State<LocationEntryScreen> {
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not open Google Maps.')),
+          const SnackBar(content: Text('')),
         );
       }
     }
