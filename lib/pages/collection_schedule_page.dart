@@ -60,7 +60,7 @@ class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF2F8F8),
+      backgroundColor: Color(0xFFF2F8F2),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
