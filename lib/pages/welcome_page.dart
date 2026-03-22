@@ -138,19 +138,7 @@ class WelcomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildImageCard() {
-    return Container(
-      height: 320,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
+
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: Stack(
