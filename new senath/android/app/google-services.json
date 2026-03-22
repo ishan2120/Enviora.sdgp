@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "691000157058",
+    "project_id": "enviora-4a37f",
+    "storage_bucket": "enviora-4a37f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:691000157058:android:5476638e7ceff284a1659b",
+        "android_client_info": {
+          "package_name": "com.enviora.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBsmd-s7HX8Aib2VZG0Tb4Yd2oMn-YSJk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
