@@ -278,7 +278,7 @@ class _SegregationGuideScreenState extends State<SegregationGuideScreen> {
     );
   }
 
-  // ── Categories Grid ────────────────────────────────────────
+  // ── Categories Grid ─────────────
 
   Widget _buildCategoriesGrid() {
     if (_categoriesLoading) {
