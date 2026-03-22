@@ -46,7 +46,7 @@ class _EnvioraAppState extends State<EnvioraApp> {
       debugShowCheckedModeBanner: false,
       locale: _locale,
       supportedLocales: const [
-        Locale('en'),
+        Locale('english'),
         Locale('si'),
         Locale('ta'),
       ],
