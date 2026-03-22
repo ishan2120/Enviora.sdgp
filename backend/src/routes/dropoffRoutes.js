@@ -34,7 +34,7 @@ router.get('/search', async (req, res) => {
   }
 });
 
-// 2. The MISSING Category Route (This is what Flutter is waiting for!)
+// 2. The MISSING Category Route (This is what Flutter is waiting for
 router.get('/:category', async (req, res) => {
   try {
     const categoryName = req.params.category;

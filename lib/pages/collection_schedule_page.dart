@@ -13,6 +13,7 @@ class CollectionSchedulePage extends StatefulWidget {
 }
 
 class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
+  // Service for fetching schedule data from the API
   final _apiService = ScheduleApiService();
   List<ScheduleItem> _fullSchedule = [];
   bool _isLoading = true;
@@ -25,9 +26,11 @@ class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
   @override
   void initState() {
     super.initState();
-    _fetchSchedule();
+    _fetchSchedule();  // Load schedule data when the page first opens
   }
-
+  /// Fetches the user's collection schedule from the API.
+  /// Uses the current Firebase Auth user's email to identify them.
+  /// Falls back to an error message if the request fails.
   Future<void> _fetchSchedule() async {
     try {
       setState(() {
@@ -48,7 +51,7 @@ class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
       });
     }
   }
-
+/// Returns only the schedule items that match the currently selected date.
   List<ScheduleItem> get _filteredSchedule {
     final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDate);
     return _fullSchedule.where((s) => s.date == dateStr).toList();
@@ -121,7 +124,7 @@ class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
               ),
             ),
 
-            SizedBox(height: 16),
+            SizedBox(height: 60),
 
             // Week days row
             SizedBox(
@@ -144,6 +147,7 @@ class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
                         horizontal: 12,
                       ),
                       decoration: BoxDecoration(
+                        // Highlight the selected day with a green tint
                         color: isSelected ? Colors.green.shade100 : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         border: isSelected ? Border.all(color: Colors.green) : null,

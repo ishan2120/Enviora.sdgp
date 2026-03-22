@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getUserActivities, addActivity } = require('../controllers/activityController');
 
-// @route   GET /api/activities
+
 // @desc    Get all activities for a user
 // @access  Private
 router.get('/', getUserActivities);
