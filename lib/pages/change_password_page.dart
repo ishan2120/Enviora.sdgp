@@ -185,7 +185,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               const Text(
                 'Confirm New Password',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF37474F),
                 ),
