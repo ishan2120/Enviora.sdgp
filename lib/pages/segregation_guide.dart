@@ -426,8 +426,7 @@ class _SegregationGuideScreenState extends State<SegregationGuideScreen> {
     );
   }
 
-  // ── Search View ────────────────────────────────────────────
-
+  // ── Search View ─────────────
   Widget _buildSearchView() {
     return Column(
       children: [
