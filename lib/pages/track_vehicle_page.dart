@@ -176,7 +176,7 @@ class _TrackVehiclePageState extends State<TrackVehiclePage> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'userId':         _userId,
-          'vehicleId':      _vehicleId,
+          'vehicleId':      ,
           'notifyWhenNear': value,
         }),
       );
