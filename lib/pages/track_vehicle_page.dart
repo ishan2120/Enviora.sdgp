@@ -187,7 +187,7 @@ class _TrackVehiclePageState extends State<TrackVehiclePage> {
     if (mounted) {
       setState(() {
         _hasError      = true;
-        
+        _errorMessage  = message;
         _isLoading     = false;
       });
     }
