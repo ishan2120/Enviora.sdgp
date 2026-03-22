@@ -721,7 +721,7 @@ class _LocationEntryScreenState extends State<LocationEntryScreen> {
                   ),
                   
                   const SizedBox(height: 16),
-                  Divider(color: Colors.grey.shade100, height: 1),
+                  Divider(color: Colors., height: 1),
                   const SizedBox(height: 8),
                   
                   Row(
