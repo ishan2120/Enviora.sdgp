@@ -495,7 +495,7 @@ class _LocationEntryScreenState extends State<LocationEntryScreen> {
   Future<void> _makePhoneCall(String phoneNumber) async {
     final Uri launchUri = Uri(
       scheme: 'tel',
-      path: phoneNumber,
+      path: ,
     );
     if (await canLaunchUrl(launchUri)) {
       await launchUrl(launchUri);
