@@ -248,9 +248,6 @@ class _DropoffSearchScreenState extends State<DropoffSearchScreen> {
   }
 }
 
-// ============================================================================
-// SECOND SCREEN: LOCATION ENTRY & DATABASE FETCH WITH GOOGLE MAPS
-// ============================================================================
 
 class LocationEntryScreen extends StatefulWidget {
   final String categoryName;
