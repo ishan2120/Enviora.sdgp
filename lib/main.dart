@@ -47,7 +47,7 @@ class _EnvioraAppState extends State<EnvioraApp> {
       locale: _locale,
       supportedLocales: const [
         Locale('en'),
-        Locale('sinhala'),
+        Locale('si'),
         Locale('tamil'),
       ],
       theme: ThemeData(
