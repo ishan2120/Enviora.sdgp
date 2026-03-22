@@ -136,7 +136,7 @@ class _TrackVehiclePageState extends State<TrackVehiclePage> {
         position: LatLng(vehicle.latitude, vehicle.longitude),
         infoWindow: InfoWindow(
           title: 'Truck ${vehicle.vehicleId}',
-          snippet: vehicle.currentLocation,
+          
         ),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
       ),
