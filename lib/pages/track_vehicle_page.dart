@@ -132,7 +132,7 @@ class _TrackVehiclePageState extends State<TrackVehiclePage> {
     // Update Markers
     _markers = {
       Marker(
-        markerId: MarkerId(vehicle.vehicleId),
+        markerId: 
         position: LatLng(vehicle.latitude, vehicle.longitude),
         infoWindow: InfoWindow(
           title: 'Truck ${vehicle.vehicleId}',
