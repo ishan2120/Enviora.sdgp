@@ -13,6 +13,7 @@ class CollectionSchedulePage extends StatefulWidget {
 }
 
 class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
+  // Service for fetching schedule data from the API
   final _apiService = ScheduleApiService();
   List<ScheduleItem> _fullSchedule = [];
   bool _isLoading = true;
@@ -25,7 +26,7 @@ class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
   @override
   void initState() {
     super.initState();
-    _fetchSchedule();
+    _fetchSchedule();  // Load schedule data when the page first opens
   }
 
   Future<void> _fetchSchedule() async {
