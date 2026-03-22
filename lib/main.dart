@@ -46,9 +46,9 @@ class _EnvioraAppState extends State<EnvioraApp> {
       debugShowCheckedModeBanner: false,
       locale: _locale,
       supportedLocales: const [
-        Locale('english'),
-        Locale('sinhala'),
-        Locale('tamil'),
+        Locale('en'),
+        Locale('si'),
+        Locale('tam'),
       ],
       theme: ThemeData(
         primarySwatch: Colors.green,
