@@ -249,7 +249,7 @@ class _SegregationGuideScreenState extends State<SegregationGuideScreen> {
     );
   }
 
-  // ── Search Bar ─────────────────────────────────────────────
+  // ── Search Bar ────────
 
   Widget _buildSearchBar() {
     return Container(
