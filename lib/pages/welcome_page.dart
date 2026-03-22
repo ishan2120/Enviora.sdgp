@@ -177,7 +177,7 @@ class WelcomePage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
                       Icon(Icons.park, size: 80, color: Colors.white70),
-                      SizedBox(height: 16),
+                      SizedBox(height: 15),
                       Text(
                         'City Park Scene',
                         style: TextStyle(color: Colors.white70, fontSize: 16),
