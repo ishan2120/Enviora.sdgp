@@ -268,7 +268,6 @@ class WelcomePage extends StatelessWidget {
         ),
         GestureDetector(
           onTap: () {
-            // Navigate to register screen
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const RegisterPage()),
