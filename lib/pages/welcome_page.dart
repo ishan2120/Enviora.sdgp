@@ -108,7 +108,7 @@ class WelcomePage extends StatelessWidget {
           child: Image.asset(
             'assets/images/logo.png',
             width: 40,
-            height: 50,
+            height: 40,
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) =>
                 const Icon(Icons.park, size: 40, color: Colors.green),
