@@ -80,7 +80,7 @@ class _SegregationGuideScreenState extends State<SegregationGuideScreen> {
     } catch (_) {}
   }
 
-  // ── Search ─────────────────────────────────────────────────
+  // ── Search ───────────
 
   void _onSearchChanged(String value) {
     _debounce?.cancel();
