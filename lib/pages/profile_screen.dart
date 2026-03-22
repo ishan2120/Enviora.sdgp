@@ -1,11 +1,58 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/custom_bottom_nav.dart';
 import 'edit_profile_screen.dart';
 import 'notifications_screen.dart';
 import 'activity_history_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String _fullName = 'Loading...';
+  String _email = '';
+  String? _photoPath;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // First use email from auth as a quick fallback
+        setState(() {
+          _email = user.email ?? '';
+          _fullName = user.displayName ?? user.email?.split('@').first ?? 'User';
+        });
+
+        // Then try to get full name and photo path from Firestore
+        final doc = await FirebaseFirestore.instance
+            .collection('user')
+            .doc(user.uid)
+            .get();
+        if (doc.exists && mounted) {
+          final data = doc.data();
+          setState(() {
+            _fullName = data?['name'] ?? _fullName;
+            _email = data?['email'] ?? _email;
+            _photoPath = data?['photoPath'];
+          });
+        }
+      }
+    } catch (e) {
+      // silently handle
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +133,29 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildProfileHeader() {
+    Widget photoWidget;
+    if (_photoPath != null && _photoPath!.isNotEmpty && File(_photoPath!).existsSync()) {
+      photoWidget = ClipOval(
+        child: Image.file(
+          File(_photoPath!),
+          fit: BoxFit.cover,
+          width: 80,
+          height: 80,
+        ),
+      );
+    } else {
+      photoWidget = Center(
+        child: Text(
+          _fullName.isNotEmpty ? _fullName[0].toUpperCase() : 'U',
+          style: const TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      );
+    }
+
     return Column(
       children: [
         Container(
@@ -95,12 +165,12 @@ class ProfileScreen extends StatelessWidget {
             color: Colors.black,
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.person, color: Colors.white, size: 50),
+          child: photoWidget,
         ),
         const SizedBox(height: 12),
-        const Text(
-          'G.G.K.Ranudaya',
-          style: TextStyle(
+        Text(
+          _fullName,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Color(0xFF2C3E50),
@@ -108,7 +178,7 @@ class ProfileScreen extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          'ggkranudaya@gmail.com',
+          _email,
           style: TextStyle(
             fontSize: 14,
             color: Colors.grey[600],
@@ -127,7 +197,7 @@ class ProfileScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -163,10 +233,10 @@ class ProfileScreen extends StatelessWidget {
               color: const Color(0xFF66BB6A), // Lighter green for card
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Row(
+            child: const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -182,22 +252,6 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        const Color(0xFF388E3C), // Darker green button
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 10),
-                    elevation: 0,
-                  ),
-                  child: const Text('Redeem',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -231,7 +285,7 @@ class ProfileScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -257,13 +311,22 @@ class ProfileScreen extends StatelessWidget {
         ),
         trailing:
             const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-        onTap: () {
+        onTap: () async {
           if (title == 'Edit Profile') {
-            Navigator.push(
+            final result = await Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const EditProfileScreen()),
+                builder: (context) => EditProfileScreen(
+                  initialFullName: _fullName,
+                  initialEmail: _email,
+                ),
+              ),
             );
+
+            if (result != null) {
+              // Reload user data whenever returning from edit screen
+              _loadUserData();
+            }
           } else if (title == 'Notifications') {
             Navigator.push(
               context,
@@ -283,7 +346,7 @@ class ProfileScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -328,16 +391,21 @@ class ProfileScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: TextButton.icon(
-        onPressed: () {},
-        icon: const Icon(Icons.logout,
-            color: Colors.red), // Use standard logout icon
+        onPressed: () async {
+          await FirebaseAuth.instance.signOut();
+          if (mounted) {
+            Navigator.pushNamedAndRemoveUntil(
+                context, '/language', (route) => false);
+          }
+        },
+        icon: const Icon(Icons.logout, color: Colors.red),
         label: const Text(
           'Log Out',
           style: TextStyle(

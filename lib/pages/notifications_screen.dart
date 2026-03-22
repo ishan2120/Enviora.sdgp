@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/custom_bottom_nav.dart';
+import '../utils/schedule_api_service.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -27,6 +29,10 @@ class NotificationItem {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
+  final _apiService = ScheduleApiService();
+  bool _isLoading = true;
+  String? _error;
+
   // Toggle States
   bool pickupRemindersEnabled = true;
   bool truckTrackingEnabled = true;
@@ -34,32 +40,41 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   bool systemUpdatesEnabled = true;
 
   // Notification History
-  List<NotificationItem> notifications = [
-    NotificationItem(
-      title: "Garbage Collection Tomorrow",
-      message: "Your waste will be collected at 8:00 AM",
-      time: "2 hours ago",
-      isRead: false,
-      icon: Icons.local_shipping,
-      iconColor: const Color(0xFF4CAF50),
-    ),
-    NotificationItem(
-      title: "Truck Nearby",
-      message: "Collection truck is 5 minutes away",
-      time: "1 day ago",
-      isRead: false,
-      icon: Icons.location_on,
-      iconColor: const Color(0xFF2196F3),
-    ),
-    NotificationItem(
-      title: "Collection Completed",
-      message: "Waste collected successfully",
-      time: "2 days ago",
-      isRead: true,
-      icon: Icons.check_circle,
-      iconColor: const Color(0xFF9E9E9E),
-    ),
-  ];
+  List<NotificationItem> notifications = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNotifications();
+  }
+
+  Future<void> _fetchNotifications() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+      final user = FirebaseAuth.instance.currentUser;
+      final email = user?.email;
+      final results = await _apiService.getNotifications(email: email);
+      setState(() {
+        notifications = results.map((n) => NotificationItem(
+          title: n.day == 'Today' ? "Collection Today" : "Collection Tomorrow",
+          message: "${n.title} at ${n.time}",
+          time: n.date,
+          isRead: false,
+          icon: Icons.local_shipping,
+          iconColor: const Color(0xFF4CAF50),
+        )).toList();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = "Failed to load notifications. Please check your connection.";
+        _isLoading = false;
+      });
+    }
+  }
 
   void _clearAllNotifications() {
     showDialog(
@@ -98,47 +113,59 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             _buildHeader(context),
 
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.all(16.0),
-                children: [
-                  // Notification History Section
-
-                  // Notification History Section
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildSectionHeader("Recent Notifications"),
-                      if (notifications.isNotEmpty)
-                        TextButton(
-                          onPressed: _clearAllNotifications,
-                          child: const Text(
-                            "Clear All",
-                            style: TextStyle(
-                              color: Color(0xFFF44336),
-                              fontWeight: FontWeight.bold,
-                            ),
+              child: _isLoading 
+                ? const Center(child: CircularProgressIndicator())
+                : _error != null 
+                  ? Center(child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(_error!, style: const TextStyle(color: Colors.red)),
+                        const SizedBox(height: 16),
+                        ElevatedButton(onPressed: _fetchNotifications, child: const Text("Retry"))
+                      ],
+                    ))
+                  : RefreshIndicator(
+                      onRefresh: _fetchNotifications,
+                      child: ListView(
+                        padding: const EdgeInsets.all(16.0),
+                        children: [
+                          // Notification History Section
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _buildSectionHeader("Upcoming Collections"),
+                              if (notifications.isNotEmpty)
+                                TextButton(
+                                  onPressed: _clearAllNotifications,
+                                  child: const Text(
+                                    "Clear All",
+                                    style: TextStyle(
+                                      color: Color(0xFFF44336),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  if (notifications.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.all(24.0),
-                      child: Center(
-                        child: Text(
-                          "No notifications",
-                          style: TextStyle(color: Colors.grey),
-                        ),
+                          const SizedBox(height: 8),
+                          if (notifications.isEmpty)
+                            const Padding(
+                              padding: EdgeInsets.all(24.0),
+                              child: Center(
+                                child: Text(
+                                  "No upcoming collections found",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ),
+                            )
+                          else
+                            ...notifications.map((item) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: _buildNotificationCard(item),
+                                )),
+                        ],
                       ),
-                    )
-                  else
-                    ...notifications.map((item) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: _buildNotificationCard(item),
-                        )),
-                ],
-              ),
+                    ),
             ),
           ],
         ),

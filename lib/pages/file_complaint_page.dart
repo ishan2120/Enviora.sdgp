@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/models.dart';
 
 class FileComplaintPage extends StatefulWidget {
@@ -14,6 +16,7 @@ class _FileComplaintPageState extends State<FileComplaintPage> {
   ReportType? _selectedQuickType;
   String? _selectedIssueType;
   final TextEditingController _detailsController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
 
@@ -107,7 +110,7 @@ class _FileComplaintPageState extends State<FileComplaintPage> {
     );
   }
 
-  void _submitComplaint() {
+  Future<void> _submitComplaint() async {
     if (_selectedQuickType == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -138,25 +141,65 @@ class _FileComplaintPageState extends State<FileComplaintPage> {
       return;
     }
 
-    // Success - In a real app, this would submit to a backend
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Report submitted successfully!'),
-        backgroundColor: Color(0xFF4CAF50),
-      ),
-    );
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You must be logged in to submit a report.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
-    // Navigate back after a short delay
-    Future.delayed(const Duration(seconds: 1), () {
+    setState(() {}); // For loading indicator if needed, though simple for now
+
+    try {
+      // In a real app, you would upload the image to Firebase Storage first
+      // For now, we'll save the report metadata
+      final reportData = {
+        'userId': user.uid,
+        'reportType': _selectedQuickType.toString().split('.').last,
+        'issueType': _selectedIssueType,
+        'description': _detailsController.text.trim(),
+        'location': _locationController.text.trim(),
+        'reportedDate': FieldValue.serverTimestamp(),
+        'status': 'pending',
+      };
+
+      await FirebaseFirestore.instance.collection('reports').add(reportData);
+
       if (mounted) {
-        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Report submitted successfully!'),
+            backgroundColor: Color(0xFF4CAF50),
+          ),
+        );
+
+        // Navigate back after a short delay
+        Future.delayed(const Duration(seconds: 1), () {
+          if (mounted) {
+            Navigator.pop(context);
+          }
+        });
       }
-    });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to submit report: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
   void dispose() {
     _detailsController.dispose();
+    _locationController.dispose();
     super.dispose();
   }
 
@@ -287,6 +330,35 @@ class _FileComplaintPageState extends State<FileComplaintPage> {
                         _selectedIssueType = newValue;
                       });
                     },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Add Location
+              const Text(
+                'Add Location',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: TextField(
+                  controller: _locationController,
+                  decoration: const InputDecoration(
+                    hintText: 'Enter report location...',
+                    hintStyle: TextStyle(color: Colors.grey),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    prefixIcon: Icon(Icons.location_on_outlined, color: Color(0xFF4CAF50)),
                   ),
                 ),
               ),

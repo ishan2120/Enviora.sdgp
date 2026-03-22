@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dashboard.dart';
+import 'welcome_page.dart';
 
 // Supported language model
 class AppLanguage {
@@ -59,9 +59,7 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage> {
       (l) => l.code == _selectedCode,
     );
     widget.onLanguageSelected(Locale(selected.code));
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-    );
+    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   @override

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'register_page.dart';
 import 'forgot_password_page.dart';
+import '../supervisor/pages/supervisor_login_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -25,12 +27,12 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Color(0xFFF2F8F2),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F5F5),
+        backgroundColor: Color(0xFFF5F5F5),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: Icon(Icons.arrow_back, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -198,7 +200,7 @@ class _LoginPageState extends State<LoginPage> {
                   boxShadow: _selectedTab == 0
                       ? [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
@@ -232,7 +234,7 @@ class _LoginPageState extends State<LoginPage> {
                   boxShadow: _selectedTab == 1
                       ? [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
@@ -349,18 +351,76 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Future<void> _signInWithEmailAndPassword() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Please enter your email and password.'),
+            backgroundColor: Colors.orange),
+      );
+      return;
+    }
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      }
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        String message;
+        switch (e.code) {
+          case 'user-not-found':
+          case 'invalid-credential':
+          case 'wrong-password':
+            message = 'Invalid email or password. Please try again.';
+            break;
+          case 'user-disabled':
+            message = 'This account has been disabled.';
+            break;
+          case 'too-many-requests':
+            message = 'Too many attempts. Please try again later.';
+            break;
+          default:
+            message = 'Login failed: ${e.message}';
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Error: ${e.toString()}'),
+              backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
   Widget _buildLoginButton() {
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
-        onPressed: () {
-          // TODO: Implement login logic
-          print('Login as ${_selectedTab == 0 ? "Citizen" : "Supervisor"}');
-          print('Email: ${_emailController.text}');
-          Navigator.pushNamedAndRemoveUntil(
-              context, '/language', (route) => false);
-        },
+        onPressed: _selectedTab == 1 
+            ? () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SupervisorLoginPage(
+                    initialEmail: _emailController.text,
+                    initialPassword: _passwordController.text,
+                  ),
+                ),
+              )
+            : _signInWithEmailAndPassword,
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF48702E),
           foregroundColor: Colors.white,
@@ -369,10 +429,8 @@ class _LoginPageState extends State<LoginPage> {
             borderRadius: BorderRadius.circular(16),
           ),
         ),
-        child: const Text(
-          'Login',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-        ),
+        child: const Text('Sign In',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
       ),
     );
   }
@@ -401,7 +459,6 @@ class _LoginPageState extends State<LoginPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Google Login Button
         _buildSocialButton(
           onTap: () {
             print('Login with Google');
@@ -418,15 +475,6 @@ class _LoginPageState extends State<LoginPage> {
               );
             },
           ),
-        ),
-        const SizedBox(width: 24),
-        // Facebook Login Button
-        _buildSocialButton(
-          onTap: () {
-            print('Login with Facebook');
-          },
-          backgroundColor: const Color(0xFF1877F2),
-          child: const Icon(Icons.facebook, color: Colors.white, size: 28),
         ),
       ],
     );
@@ -447,7 +495,7 @@ class _LoginPageState extends State<LoginPage> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),

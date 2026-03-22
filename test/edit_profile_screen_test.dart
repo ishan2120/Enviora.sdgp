@@ -5,7 +5,11 @@ import 'package:enviora_profile/pages/edit_profile_screen.dart';
 void main() {
   testWidgets('Edit Profile Screen renders correctly',
       (WidgetTester tester) async {
-    await tester.pumpWidget(const MaterialApp(home: EditProfileScreen()));
+    await tester.pumpWidget(const MaterialApp(
+        home: EditProfileScreen(
+      initialFullName: 'Test User',
+      initialEmail: 'test@example.com',
+    )));
 
     // Check Header
     expect(find.text('Edit Profile'), findsOneWidget);
@@ -24,7 +28,11 @@ void main() {
   });
 
   testWidgets('Input fields allow text entry', (WidgetTester tester) async {
-    await tester.pumpWidget(const MaterialApp(home: EditProfileScreen()));
+    await tester.pumpWidget(const MaterialApp(
+        home: EditProfileScreen(
+      initialFullName: 'Test User',
+      initialEmail: 'test@example.com',
+    )));
 
     await tester.enterText(find.byKey(const Key('fullNameField')), 'John Doe');
     expect(find.text('John Doe'), findsOneWidget);
@@ -38,7 +46,11 @@ void main() {
       home: Builder(
         builder: (context) => TextButton(
           onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => const EditProfileScreen())),
+              MaterialPageRoute(
+                  builder: (_) => const EditProfileScreen(
+                        initialFullName: 'Test User',
+                        initialEmail: 'test@example.com',
+                      ))),
           child: const Text('Go'),
         ),
       ),
@@ -59,7 +71,11 @@ void main() {
 
   testWidgets('Save button shows snackbar on valid input',
       (WidgetTester tester) async {
-    await tester.pumpWidget(const MaterialApp(home: EditProfileScreen()));
+    await tester.pumpWidget(const MaterialApp(
+        home: EditProfileScreen(
+      initialFullName: 'Test User',
+      initialEmail: 'test@example.com',
+    )));
 
     // Enter valid mobile number
     await tester.enterText(find.byKey(const Key('mobileField')), '1234567890');

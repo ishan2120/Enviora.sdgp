@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 enum ReportType {
   missedCollection,
   illegalDumping,
@@ -15,8 +17,51 @@ class Report {
   final String issueType;
   final String description;
   final String? imageUrl;
+  final String? location;
   final ReportStatus status;
   final DateTime reportedDate;
+
+  factory Report.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return Report(
+      id: doc.id,
+      type: _parseType(data['reportType']),
+      issueType: data['issueType'] ?? 'Unknown',
+      description: data['description'] ?? '',
+      imageUrl: data['imageUrl'],
+      location: data['location'],
+      status: _parseStatus(data['status']),
+      reportedDate: (data['reportedDate'] as Timestamp?)?.toDate() ?? DateTime.now(),
+    );
+  }
+
+  static ReportType _parseType(String? type) {
+    switch (type?.toLowerCase()) {
+      case 'missedcollection':
+      case 'missed collection':
+        return ReportType.missedCollection;
+      case 'illegaldumping':
+      case 'illegal dumping':
+        return ReportType.illegalDumping;
+      default:
+        return ReportType.missedCollection;
+    }
+  }
+
+  static ReportStatus _parseStatus(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'pending':
+        return ReportStatus.pending;
+      case 'inprogress':
+      case 'in progress':
+      case 'accepted': // Maps accepted to inProgress for this UI for now
+        return ReportStatus.inProgress;
+      case 'resolved':
+        return ReportStatus.resolved;
+      default:
+        return ReportStatus.pending;
+    }
+  }
 
   Report({
     required this.id,
@@ -24,6 +69,7 @@ class Report {
     required this.issueType,
     required this.description,
     this.imageUrl,
+    this.location,
     required this.status,
     required this.reportedDate,
   });

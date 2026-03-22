@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/custom_bottom_nav.dart';
 
 class ActivityItem {
@@ -38,123 +40,7 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
   String _selectedFilter = 'All';
   final List<String> _filters = ['All', 'Reports', 'Pickups', 'Completed'];
 
-  // Sample Data
-  final List<ActivityItem> _allActivities = [
-    // REPORTED ISSUES
-    ActivityItem(
-      id: 'ENV-2026-001',
-      title: 'Illegal Dumping Reported',
-      subtitle: 'Near Galle Road, Colombo 03',
-      date: '15 Feb 2026',
-      status: 'Pending',
-      description: 'Reported large pile of construction waste',
-      icon: Icons.warning_amber_rounded,
-      iconColor: Colors.red,
-      statusColor: const Color(0xFFFF9800),
-      type: 'report',
-    ),
-    ActivityItem(
-      id: 'ENV-2026-002',
-      title: 'Illegal Dumping Reported',
-      subtitle: 'Nugegoda Junction, Colombo',
-      date: '10 Feb 2026',
-      status: 'Resolved',
-      description: 'Municipal team cleared the waste',
-      icon: Icons.check_circle_outline,
-      iconColor: Colors.green,
-      statusColor: const Color(0xFF4CAF50),
-      type: 'report',
-    ),
-    // SPECIAL PICKUP REQUESTS
-    ActivityItem(
-      id: 'ENV-2026-003',
-      title: 'Special Pickup Request',
-      subtitle: 'Old sofa and wooden furniture',
-      date: '14 Feb 2026',
-      status: 'In Progress',
-      description: 'Scheduled for pickup on 18 Feb 2026',
-      icon: Icons.local_shipping_outlined,
-      iconColor: Colors.blue,
-      statusColor: const Color(0xFF2196F3),
-      type: 'pickup',
-    ),
-    ActivityItem(
-      id: 'ENV-2026-004',
-      title: 'Special Pickup Request',
-      subtitle: 'Tree trunks and garden waste',
-      date: '05 Feb 2026',
-      status: 'Completed',
-      description: 'Items successfully collected',
-      icon: Icons.check_circle_outline,
-      iconColor: Colors.green,
-      statusColor: const Color(0xFF4CAF50),
-      type: 'pickup',
-    ),
-    ActivityItem(
-      id: 'ENV-2026-005',
-      title: 'Special Pickup Request',
-      subtitle: 'Old refrigerator and washing machine',
-      date: '16 Feb 2026',
-      status: 'Pending',
-      description: 'Awaiting municipal confirmation',
-      icon: Icons.local_shipping_outlined,
-      iconColor: Colors.orange,
-      statusColor: const Color(0xFFFF9800),
-      type: 'pickup',
-    ),
-    // COMPLETED COLLECTIONS
-    ActivityItem(
-      id: 'ENV-2026-006',
-      title: 'Garbage Collection',
-      subtitle: 'Weekly collection - Zone 5',
-      date: '12 Feb 2026',
-      status: 'Completed',
-      description: 'Organic and recyclable waste collected',
-      icon: Icons.recycling,
-      iconColor: Colors.green,
-      statusColor: const Color(0xFF4CAF50),
-      type: 'collection',
-    ),
-    ActivityItem(
-      id: 'ENV-2026-007',
-      title: 'Garbage Collection',
-      subtitle: 'Weekly collection - Zone 5',
-      date: '05 Feb 2026',
-      status: 'Completed',
-      description: 'All waste types collected successfully',
-      icon: Icons.recycling,
-      iconColor: Colors.green,
-      statusColor: const Color(0xFF4CAF50),
-      type: 'collection',
-    ),
-    ActivityItem(
-      id: 'ENV-2026-008',
-      title: 'Garbage Collection',
-      subtitle: 'Weekly collection - Zone 5',
-      date: '29 Jan 2026',
-      status: 'Missed',
-      description: 'Collection was not completed on schedule',
-      icon: Icons.cancel_outlined,
-      iconColor: Colors.red,
-      statusColor: const Color(0xFFF44336),
-      type: 'collection',
-    ),
-  ];
 
-  List<ActivityItem> get _filteredActivities {
-    if (_selectedFilter == 'All') {
-      return _allActivities;
-    } else if (_selectedFilter == 'Reports') {
-      return _allActivities.where((a) => a.type == 'report').toList();
-    } else if (_selectedFilter == 'Pickups') {
-      return _allActivities.where((a) => a.type == 'pickup').toList();
-    } else if (_selectedFilter == 'Completed') {
-      return _allActivities
-          .where((a) => a.status == 'Completed' || a.status == 'Resolved')
-          .toList();
-    }
-    return [];
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,19 +56,72 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
             _buildSummaryCards(),
             const SizedBox(height: 12),
             Expanded(
-              child: _filteredActivities.isEmpty
-                  ? _buildEmptyState()
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: _filteredActivities.length,
-                      physics: const BouncingScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: ActivityCard(item: _filteredActivities[index]),
-                        );
-                      },
-                    ),
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('reports')
+                    .where('userId', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final docs = List<DocumentSnapshot>.from(snapshot.data!.docs);
+                  
+                  // Sort in memory
+                  docs.sort((a, b) {
+                    final aData = a.data() as Map<String, dynamic>;
+                    final bData = b.data() as Map<String, dynamic>;
+                    final aDate = (aData['reportedDate'] as Timestamp?)?.toDate() ?? DateTime(0);
+                    final bDate = (bData['reportedDate'] as Timestamp?)?.toDate() ?? DateTime(0);
+                    return bDate.compareTo(aDate);
+                  });
+
+                  final filteredDocs = docs.where((doc) {
+                    final data = doc.data() as Map<String, dynamic>;
+                    if (_selectedFilter == 'All') return true;
+                    if (_selectedFilter == 'Reports') return true; // For now all are reports
+                    if (_selectedFilter == 'Completed') return data['status'] == 'resolved';
+                    return true;
+                  }).toList();
+
+                  if (filteredDocs.isEmpty) {
+                    return _buildEmptyState();
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: filteredDocs.length,
+                    physics: const BouncingScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      final doc = filteredDocs[index];
+                      final data = doc.data() as Map<String, dynamic>;
+                      
+                      // Map Firestore data to ActivityItem or similar UI
+                      final item = ActivityItem(
+                        id: doc.id,
+                        title: '${data['reportType'] ?? 'Waste'} Report',
+                        subtitle: data['location'] ?? 'Location not provided',
+                        date: _formatDate(data['reportedDate']),
+                        status: _capitalize(data['status'] ?? 'pending'),
+                        description: data['description'] ?? '',
+                        icon: _getStatusIcon(data['status']),
+                        iconColor: _getStatusColor(data['status']),
+                        statusColor: _getStatusColor(data['status']),
+                        type: 'report',
+                      );
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: ActivityCard(item: item),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -307,7 +246,7 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -339,6 +278,45 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
         ],
       ),
     );
+  }
+
+  String _formatDate(dynamic timestamp) {
+    if (timestamp == null) return 'Just now';
+    if (timestamp is Timestamp) {
+      final date = timestamp.toDate();
+      return '${date.day} ${_getMonth(date.month)} ${date.year}';
+    }
+    return 'Unknown date';
+  }
+
+  String _getMonth(int month) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months[month - 1];
+  }
+
+  IconData _getStatusIcon(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'pending': return Icons.schedule;
+      case 'resolved': return Icons.check_circle_outline;
+      case 'inprogress':
+      case 'in progress': return Icons.sync;
+      default: return Icons.info_outline;
+    }
+  }
+
+  Color _getStatusColor(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'pending': return Colors.orange;
+      case 'resolved': return Colors.green;
+      case 'inprogress':
+      case 'in progress': return Colors.blue;
+      default: return Colors.grey;
+    }
+  }
+
+  String _capitalize(String s) {
+    if (s.isEmpty) return s;
+    return s[0].toUpperCase() + s.substring(1);
   }
 
   Widget _buildEmptyState() {
@@ -390,7 +368,7 @@ class _ActivityCardState extends State<ActivityCard> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -424,7 +402,7 @@ class _ActivityCardState extends State<ActivityCard> {
                             // Icon
                             CircleAvatar(
                               backgroundColor:
-                                  widget.item.statusColor.withOpacity(0.1),
+                                  widget.item.statusColor.withValues(alpha: 0.1),
                               radius: 20,
                               child: Icon(
                                 widget.item.icon,

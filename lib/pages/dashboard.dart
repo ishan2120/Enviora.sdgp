@@ -1,13 +1,142 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/custom_bottom_nav.dart';
 import 'profile_screen.dart';
 import 'notifications_screen.dart';
+import 'dropoff_search_screen.dart';
+import 'file_complaint_page.dart';
 import 'collection_schedule_page.dart';
 import 'track_vehicle_page.dart';
 import 'my_reports_page.dart';
+import '../utils/schedule_api_service.dart';
+import 'package:intl/intl.dart';
 
-class HomeScreen extends StatelessWidget {
+bool _globalHasShownPopup = false;
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String _userName = 'User';
+  String? _photoPath;
+  ScheduleItem? _nextPickup;
+  Announcement? _latestAnnouncement;
+  bool _isLoadingSchedule = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+    _loadSchedule();
+  }
+
+  Future<void> _loadSchedule() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null && user.email != null) {
+        final apiService = ScheduleApiService();
+        final schedules = await apiService.getMySchedule(email: user.email);
+        
+        if (schedules.isNotEmpty) {
+          // Sort logically if backend hasn't (assuming date format is YYYY-MM-DD)
+          schedules.sort((a, b) => a.date.compareTo(b.date));
+          
+          final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
+          final upcomingSchedules = schedules.where((s) => s.date.compareTo(todayStr) >= 0).toList();
+          
+          if (upcomingSchedules.isNotEmpty) {
+            setState(() {
+               _nextPickup = upcomingSchedules.first;
+               _isLoadingSchedule = false;
+            });
+            
+            // Show popup if the pickup is today and we haven't shown it yet
+            if (_nextPickup!.date == todayStr && !_globalHasShownPopup) {
+               _globalHasShownPopup = true;
+               WidgetsBinding.instance.addPostFrameCallback((_) {
+                 _showTodayPickupPopup(_nextPickup!);
+               });
+            }
+            return;
+          }
+        }
+      }
+    } catch (e) {
+      print('Failed to load schedule: $e');
+    }
+    setState(() {
+      _isLoadingSchedule = false;
+    });
+  }
+
+  void _showTodayPickupPopup(ScheduleItem pickup) {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.directions_car, color: Colors.green),
+            SizedBox(width: 8),
+            Text('Collection Today!'),
+          ],
+        ),
+        content: Text(
+          'A truck is scheduled to collect ${pickup.type} today around ${pickup.time}. Please have your waste ready.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Got it', style: TextStyle(color: Colors.green)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        setState(() {
+          _userName = user.displayName ?? (user.email?.split('@').first ?? 'User');
+        });
+
+        // Try to get photo path, name, and address from Firestore
+        final doc = await FirebaseFirestore.instance
+            .collection('user')
+            .doc(user.uid)
+            .get();
+            
+        if (doc.exists && mounted) {
+          final data = doc.data();
+          setState(() {
+            _userName = data?['name'] ?? _userName;
+            _photoPath = data?['photoPath'];
+          });
+          
+          final address = data?['address'];
+          if (address != null && address.toString().isNotEmpty) {
+             final announcements = await ScheduleApiService().getAnnouncements(address);
+             if (announcements.isNotEmpty && mounted) {
+                setState(() {
+                   _latestAnnouncement = announcements.first;
+                });
+             }
+          }
+        }
+      }
+    } catch (e) {
+      // silently handle
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +153,14 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   // Profile Picture
                   GestureDetector(
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (_) => const ProfileScreen()),
                       );
+                      // Refresh data when returning from profile
+                      _loadUserData();
                     },
                     child: Container(
                       width: 40,
@@ -40,13 +171,21 @@ class HomeScreen extends StatelessWidget {
                             Border.all(color: Colors.grey.shade300, width: 1),
                       ),
                       child: ClipOval(
-                        child: Image.network(
-                          'https://i.pravatar.cc/150?img=1',
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(Icons.person, size: 24);
-                          },
-                        ),
+                        child: (_photoPath != null && _photoPath!.isNotEmpty && File(_photoPath!).existsSync())
+                            ? Image.file(
+                                File(_photoPath!),
+                                fit: BoxFit.cover,
+                              )
+                            : Center(
+                                child: Text(
+                                  _userName.isNotEmpty ? _userName[0].toUpperCase() : 'U',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF4CAF50),
+                                  ),
+                                ),
+                              ),
                       ),
                     ),
                   ),
@@ -66,53 +205,14 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 2),
-                        const Text(
-                          'Kisanda',
-                          style: TextStyle(
+                        Text(
+                          _userName,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF000000),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  // Language Selector
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFD4E7D4),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      children: [
-                        const Text(
-                          'EN',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF2D5F2E),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          '/ සි',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xFF2D5F2E),
-                          ),
-                        ),
-                        const Text(
-                          '/ த',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF2D5F2E),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
                       ],
                     ),
                   ),
@@ -171,18 +271,22 @@ class HomeScreen extends StatelessWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'Tomorrow, 8.00 AM',
-                                    style: TextStyle(
+                                  Text(
+                                    _isLoadingSchedule
+                                        ? 'Loading...'
+                                        : (_nextPickup != null 
+                                          ? '${_formatDate(_nextPickup!.date)}, ${_nextPickup!.time}' 
+                                          : 'No upcoming pickup'),
+                                    style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w700,
                                       color: Color(0xFF000000),
                                     ),
                                   ),
                                   const SizedBox(height: 4),
-                                  const Text(
-                                    'Recyclables & Paper',
-                                    style: TextStyle(
+                                  Text(
+                                    _nextPickup?.type ?? '---',
+                                    style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400,
                                       color: Color(0xFF2D5F2E),
@@ -206,18 +310,18 @@ class HomeScreen extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Pickup in 5 days',
-                                style: TextStyle(
+                              Text(
+                                _nextPickup != null ? 'Upcoming Collection' : '',
+                                style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w400,
                                   color: Color(0xFF2D5F2E),
                                 ),
                               ),
                               const SizedBox(height: 2),
-                              const Text(
-                                'Friday, November 29',
-                                style: TextStyle(
+                              Text(
+                                _nextPickup != null ? 'Serving: ${_nextPickup!.roads}' : '',
+                                style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w400,
                                   color: Color(0xFF666666),
@@ -286,48 +390,137 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Column(
                       children: [
-                        _buildQuickActionButton(
-                          icon: Icons.warning_amber_rounded,
-                          label: 'REPORT ISSUE',
-                          color: const Color(0xFFFF6B6B),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const MyReportsPage()),
-                            );
-                          },
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildQuickActionButton(
+                              icon: Icons.warning_amber_rounded,
+                              label: 'REPORT ISSUE',
+                              color: const Color(0xFFFF6B6B),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const MyReportsPage()),
+                                );
+                              },
+                            ),
+                            _buildQuickActionButton(
+                              icon: Icons.calendar_today,
+                              label: 'VIEW SCHEDULE',
+                              color: const Color(0xFF000000),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) =>
+                                          const CollectionSchedulePage()),
+                                );
+                              },
+                            ),
+                            _buildQuickActionButton(
+                              icon: Icons.location_on,
+                              label: 'TRACK TRUCK',
+                              color: const Color(0xFF4CAF50),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const TrackVehiclePage()),
+                                );
+                              },
+                            ),
+                          ],
                         ),
-                        _buildQuickActionButton(
-                          icon: Icons.calendar_today,
-                          label: 'VIEW SCHEDULE',
-                          color: const Color(0xFF000000),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) =>
-                                      const CollectionSchedulePage()),
-                            );
-                          },
-                        ),
-                        _buildQuickActionButton(
-                          icon: Icons.location_on,
-                          label: 'TRACK TRUCK',
-                          color: const Color(0xFF4CAF50),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const TrackVehiclePage()),
-                            );
-                          },
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            _buildQuickActionButton(
+                              icon: Icons.eco_outlined,
+                              label: 'DROP-OFF LOCATIONS',
+                              color: const Color(0xFF4CAF50),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const DropoffSearchScreen()),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
+
+                    if (_latestAnnouncement != null) ...[
+                      const SizedBox(height: 24),
+                      const Text(
+                        'Supervisor Alert',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF000000),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: _latestAnnouncement!.type == 'breakdown' || _latestAnnouncement!.type == 'postponement' 
+                              ? const Color(0xFFFFEBEB) 
+                              : const Color(0xFFE3F2FD),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                              color: _latestAnnouncement!.type == 'breakdown' || _latestAnnouncement!.type == 'postponement' 
+                                  ? Colors.red.shade200 
+                                  : Colors.blue.shade200),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              _latestAnnouncement!.type == 'breakdown' ? Icons.warning_amber_rounded 
+                              : _latestAnnouncement!.type == 'postponement' ? Icons.schedule 
+                              : Icons.info_outline,
+                              color: _latestAnnouncement!.type == 'breakdown' || _latestAnnouncement!.type == 'postponement' 
+                                  ? Colors.red 
+                                  : Colors.blue,
+                              size: 28,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _latestAnnouncement!.type.toUpperCase(),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: _latestAnnouncement!.type == 'breakdown' || _latestAnnouncement!.type == 'postponement' 
+                                          ? Colors.red 
+                                          : Colors.blue,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    _latestAnnouncement!.message,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xFF333333),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
 
                     const SizedBox(height: 24),
 
@@ -365,11 +558,11 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Expanded(
+                          const Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
+                                Text(
                                   'DID YOU KNOW ?',
                                   style: TextStyle(
                                     fontSize: 11,
@@ -378,8 +571,8 @@ class HomeScreen extends StatelessWidget {
                                     letterSpacing: 0.5,
                                   ),
                                 ),
-                                const SizedBox(height: 6),
-                                const Text(
+                                SizedBox(height: 6),
+                                Text(
                                   'Always give your recyclable containers (like plastic bottles, glass jars) a quick rinse before throwing them in the recycling bin.',
                                   style: TextStyle(
                                     fontSize: 13,
@@ -430,11 +623,11 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Expanded(
+                          const Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
+                                Text(
                                   'Glass Collection Completed',
                                   style: TextStyle(
                                     fontSize: 14,
@@ -442,8 +635,8 @@ class HomeScreen extends StatelessWidget {
                                     color: Color(0xFF000000),
                                   ),
                                 ),
-                                const SizedBox(height: 4),
-                                const Text(
+                                SizedBox(height: 4),
+                                Text(
                                   'Yesterday 9:15 AM',
                                   style: TextStyle(
                                     fontSize: 12,
@@ -491,7 +684,7 @@ class HomeScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -518,5 +711,23 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _formatDate(String dateStr) {
+    try {
+      final date = DateTime.parse(dateStr);
+      final today = DateTime.now();
+      final tomorrow = DateTime.now().add(const Duration(days: 1));
+      
+      if (date.year == today.year && date.month == today.month && date.day == today.day) {
+        return 'Today';
+      } else if (date.year == tomorrow.year && date.month == tomorrow.month && date.day == tomorrow.day) {
+        return 'Tomorrow';
+      } else {
+        return DateFormat('EEEE, MMM d').format(date);
+      }
+    } catch (e) {
+      return dateStr;
+    }
   }
 }

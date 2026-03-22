@@ -25,7 +25,7 @@ class WelcomePage extends StatelessWidget {
             ),
           ),
           // Content
-          Container(
+          SizedBox(
             width: double.infinity,
             child: SafeArea(
               child: SingleChildScrollView(
@@ -75,8 +75,7 @@ class WelcomePage extends StatelessWidget {
 
                       const SizedBox(height: 24),
 
-                      // Pagination dots
-                      _buildPaginationDots(),
+                      // Remove pagination dots here as requested
 
                       const SizedBox(height: 32),
 
@@ -147,7 +146,7 @@ class WelcomePage extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -195,7 +194,7 @@ class WelcomePage extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black.withOpacity(0.2)],
+                  colors: [Colors.transparent, Colors.black.withValues(alpha: 0.2)],
                 ),
               ),
             ),
@@ -230,11 +229,8 @@ class WelcomePage extends StatelessWidget {
       height: 56,
       child: ElevatedButton(
         onPressed: () {
-          // Navigate to login screen
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginPage()),
-          );
+          // Navigate to language selection screen
+          Navigator.pushReplacementNamed(context, '/language');
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF48702E),

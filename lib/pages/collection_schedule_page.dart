@@ -1,32 +1,58 @@
-import 'package:flutter/material.dart';
+import '../utils/schedule_api_service.dart';
 import '../widgets/custom_bottom_nav.dart';
+import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
-void main() {
-  runApp(CollectionApp());
-}
-
-// display the weekly collection schedule
-class CollectionApp extends StatelessWidget {
-  const CollectionApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: CollectionSchedulePage(),
-    );
-  }
-}
-
+// Collection schedule page widget
 class CollectionSchedulePage extends StatefulWidget {
   const CollectionSchedulePage({super.key});
 
   @override
-  _CollectionSchedulePageState createState() => _CollectionSchedulePageState();
+  State<CollectionSchedulePage> createState() => _CollectionSchedulePageState();
 }
 
 class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
-  int selectedDay = 1; // Tuesday selected
+  final _apiService = ScheduleApiService();
+  List<ScheduleItem> _fullSchedule = [];
+  bool _isLoading = true;
+  String? _error;
+  
+  DateTime _selectedDate = DateTime(2026, 3, 21); // Start of target range
+  final DateTime _rangeStart = DateTime(2026, 3, 21);
+  final DateTime _rangeEnd = DateTime(2026, 4, 21);
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSchedule();
+  }
+
+  Future<void> _fetchSchedule() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+      final user = FirebaseAuth.instance.currentUser;
+      final email = user?.email;
+      final results = await _apiService.getMySchedule(email: email);
+      setState(() {
+        _fullSchedule = results;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = "Failed to load schedule. Using offline data.";
+        _isLoading = false;
+      });
+    }
+  }
+
+  List<ScheduleItem> get _filteredSchedule {
+    final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDate);
+    return _fullSchedule.where((s) => s.date == dateStr).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,48 +121,39 @@ class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
               ),
             ),
 
-            SizedBox(height: 19),
+            SizedBox(height: 16),
 
             // Week days row
             SizedBox(
               height: 90,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: 7,
+                itemCount: 14, // Show 2 weeks for selection
                 itemBuilder: (context, index) {
-                  final days = [
-                    "Mon",
-                    "Tue",
-                    "Wed",
-                    "Thu",
-                    "Fri",
-                    "Sat",
-                    "Sun",
-                  ];
-                  final dates = ["13", "14", "15", "16", "17", "18", "19"];
-
-                  bool isSelected = index == selectedDay;
+                  final date = _rangeStart.add(Duration(days: index));
+                  final dayName = DateFormat('E').format(date);
+                  final dayDate = DateFormat('d').format(date);
+                  bool isSelected = DateFormat('yyyy-MM-dd').format(date) == DateFormat('yyyy-MM-dd').format(_selectedDate);
 
                   return GestureDetector(
-                    onTap: () => setState(() => selectedDay = index),
+                    onTap: () => setState(() => _selectedDate = date),
                     child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 10),
-                      padding: EdgeInsets.symmetric(
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(
                         vertical: 8,
                         horizontal: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: isSelected
-                            ? Colors.green.shade100
-                            : Colors.white,
+                        color: isSelected ? Colors.green.shade100 : Colors.white,
                         borderRadius: BorderRadius.circular(12),
+                        border: isSelected ? Border.all(color: Colors.green) : null,
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(days[index]),
-                          SizedBox(height: 5),
-                          Text(dates[index]),
+                          Text(dayName, style: TextStyle(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+                          const SizedBox(height: 5),
+                          Text(dayDate, style: TextStyle(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
                         ],
                       ),
                     ),
@@ -145,32 +162,38 @@ class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
               ),
             ),
 
-            sectionTitle("Today, January 13"),
-            collectionCard(
-              icon: Icons.delete,
-              title: "General Waste",
-              subtitle: "Picked up",
-              status: "Collected",
-              statusColor: Colors.green.shade300,
-            ),
-
-            sectionTitle("Tomorrow, January 14"),
-            collectionCard(
-              icon: Icons.delete,
-              title: "General Waste",
-              subtitle: "7.00 a.m - 11.00 a.m",
-              status: "Pending",
-              statusColor: Colors.orange,
-            ),
-
-            sectionTitle("January 16"),
-            collectionCard(
-              icon: Icons.recycling,
-              title: "Recycling",
-              subtitle: "7.00 a.m - 11.00 a.m",
-              status: "Pending",
-              statusColor: Colors.orange,
-            ),
+            if (_isLoading)
+               const Padding(
+                 padding: EdgeInsets.all(40.0),
+                 child: CircularProgressIndicator(),
+               )
+            else if (_error != null)
+               Padding(
+                 padding: const EdgeInsets.all(20.0),
+                 child: Text(_error!, style: const TextStyle(color: Colors.red)),
+               )
+            else ...[
+              sectionTitle("Collections for ${DateFormat('MMMM d').format(_selectedDate)}"),
+              if (_filteredSchedule.isEmpty)
+                Container(
+                  padding: const EdgeInsets.all(40),
+                  child: const Column(
+                    children: [
+                      Icon(Icons.calendar_today_outlined, size: 48, color: Colors.grey),
+                      SizedBox(height: 16),
+                      Text("No collections scheduled for this day", style: TextStyle(color: Colors.grey)),
+                    ],
+                  ),
+                )
+              else
+                ..._filteredSchedule.map((s) => collectionCard(
+                  icon: s.type.contains('Recyclable') ? Icons.recycling : Icons.delete,
+                  title: s.type,
+                  subtitle: "${s.time} (Ward: ${s.ward})",
+                  status: "Scheduled",
+                  statusColor: Colors.blue,
+                )),
+            ],
 
             SizedBox(height: 20),
 
@@ -244,7 +267,7 @@ class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
           Container(
             padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.2),
+              color: statusColor.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(status, style: TextStyle(color: statusColor)),

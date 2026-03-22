@@ -1,10 +1,19 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
+  final String initialFullName;
+  final String initialEmail;
+
+  const EditProfileScreen({
+    super.key,
+    required this.initialFullName,
+    required this.initialEmail,
+  });
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -13,16 +22,43 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers
-  final TextEditingController _fullNameController =
-      TextEditingController(text: "G.G.K.Ranudaya");
-  final TextEditingController _mobileController = TextEditingController();
-  final TextEditingController _emailController =
-      TextEditingController(text: "ggkranudaya@gmail.com");
-  final TextEditingController _addressController = TextEditingController();
+  late TextEditingController _fullNameController;
+  late TextEditingController _mobileController;
+  late TextEditingController _emailController;
+  late TextEditingController _addressController;
 
   File? _profileImage;
+  String? _existingPhotoPath; // path stored in Firestore
+  bool _isSaving = false;
   final ImagePicker _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _fullNameController = TextEditingController(text: widget.initialFullName);
+    _mobileController = TextEditingController();
+    _emailController = TextEditingController(text: widget.initialEmail);
+    _addressController = TextEditingController();
+    _loadExistingPhoto();
+  }
+
+  Future<void> _loadExistingPhoto() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      final doc = await FirebaseFirestore.instance
+          .collection('user')
+          .doc(user.uid)
+          .get();
+      if (doc.exists && mounted) {
+        final path = doc.data()?['photoPath'] as String?;
+        if (path != null && path.isNotEmpty) {
+          setState(() => _existingPhotoPath = path);
+        }
+      }
+    } catch (_) {}
+  }
 
   @override
   void dispose() {
@@ -34,36 +70,79 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _pickImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+    );
+    if (image != null && mounted) {
       setState(() {
         _profileImage = File(image.path);
       });
     }
   }
 
-  void _saveProfile() {
-    if (_formKey.currentState!.validate()) {
-      // Simulate saving
+  Future<void> _saveProfile() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isSaving = true);
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception('Not logged in');
+
+      final newName = _fullNameController.text.trim();
+      final photoPath = _profileImage?.path ?? _existingPhotoPath ?? '';
+
+      // 1. Update Firebase Auth display name
+      await user.updateDisplayName(newName);
+
+      // 2. Update Firestore user document
+      await FirebaseFirestore.instance
+          .collection('user')
+          .doc(user.uid)
+          .set({
+        'name': newName,
+        'email': _emailController.text.trim(),
+        'photoPath': photoPath,
+      }, SetOptions(merge: true));
+
+      if (!mounted) return;
+
+      // 3. Pop back with updated info so ProfileScreen and Dashboard can refresh
+      Navigator.pop(context, {
+        'fullName': newName,
+        'email': _emailController.text.trim(),
+        'photoPath': photoPath,
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Profile updated successfully!'),
           backgroundColor: Color(0xFF388E3C),
         ),
       );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE8F5E9), // Light mint green
+      backgroundColor: const Color(0xFFE8F5E9),
       body: SafeArea(
         child: Column(
           children: [
-            // Header
             _buildHeader(context),
-
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -72,15 +151,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   child: Column(
                     children: [
                       const SizedBox(height: 20),
-                      // Profile Photo
                       _buildProfilePhoto(),
                       const SizedBox(height: 30),
 
-                      // Form Fields
                       _buildTextField(
                         key: const Key('fullNameField'),
                         controller: _fullNameController,
-                        label: "Full Name",
+                        label: 'Full Name',
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your full name';
@@ -92,13 +169,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       _buildTextField(
                         key: const Key('mobileField'),
                         controller: _mobileController,
-                        label: "Mobile Number",
+                        label: 'Mobile Number',
                         keyboardType: TextInputType.phone,
                         validator: (value) {
-                          // Basic validation, can be more strict
                           if (value != null && value.isNotEmpty) {
-                            if (value.length < 10)
-                              return 'Invalid mobile number';
+                            if (value.length < 10) return 'Invalid mobile number';
                           }
                           return null;
                         },
@@ -107,7 +182,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       _buildTextField(
                         key: const Key('emailField'),
                         controller: _emailController,
-                        label: "Email Address",
+                        label: 'Email Address',
                         keyboardType: TextInputType.emailAddress,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -123,64 +198,50 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       _buildTextField(
                         key: const Key('addressField'),
                         controller: _addressController,
-                        label: "Primary Address",
+                        label: 'Primary Address',
                         maxLines: 3,
-                      ),
-                      const SizedBox(height: 12),
-
-                      // Change Password Link
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            // Show change password dialog
-                          },
-                          child: const Text(
-                            "Change Password?",
-                            style: TextStyle(
-                              color: Color(0xFF4CAF50),
-                              decoration: TextDecoration.underline,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
                       ),
                       const SizedBox(height: 24),
 
-                      // Action Buttons
                       Row(
                         children: [
                           Expanded(
                             child: OutlinedButton(
-                              onPressed: () => Navigator.pop(context),
+                              onPressed:
+                                  _isSaving ? null : () => Navigator.pop(context),
                               style: OutlinedButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 foregroundColor: const Color(0xFF212121),
                                 side: const BorderSide(color: Colors.grey),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
+                                    borderRadius: BorderRadius.circular(24)),
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 16),
                               ),
-                              child: const Text("Cancel"),
+                              child: const Text('Cancel'),
                             ),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
                             child: ElevatedButton(
-                              onPressed: _saveProfile,
+                              onPressed: _isSaving ? null : _saveProfile,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF388E3C),
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
+                                    borderRadius: BorderRadius.circular(24)),
                                 elevation: 2,
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 16),
                               ),
-                              child: const Text("Save Changes"),
+                              child: _isSaving
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                          color: Colors.white, strokeWidth: 2),
+                                    )
+                                  : const Text('Save Changes'),
                             ),
                           ),
                         ],
@@ -198,38 +259,45 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Column(
-      children: [
-        // App Bar content
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-          child: Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => Navigator.pop(context),
-              ),
-              Expanded(
-                child: Center(
-                  child: Text(
-                    'Edit Profile',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF212121),
-                    ),
-                  ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: _isSaving ? null : () => Navigator.pop(context),
+          ),
+          const Expanded(
+            child: Center(
+              child: Text(
+                'Edit Profile',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF212121),
                 ),
               ),
-              const SizedBox(width: 48), // Balance for back button
-            ],
+            ),
           ),
-        ),
-      ],
+          const SizedBox(width: 48),
+        ],
+      ),
     );
   }
 
   Widget _buildProfilePhoto() {
+    // Determine which image to show
+    Widget photoWidget;
+    if (_profileImage != null) {
+      photoWidget = Image.file(_profileImage!, fit: BoxFit.cover);
+    } else if (_existingPhotoPath != null &&
+        _existingPhotoPath!.isNotEmpty &&
+        File(_existingPhotoPath!).existsSync()) {
+      photoWidget = Image.file(File(_existingPhotoPath!), fit: BoxFit.cover);
+    } else {
+      photoWidget = const Icon(Icons.person, color: Colors.white, size: 60);
+    }
+
     return Stack(
       children: [
         Container(
@@ -240,9 +308,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             shape: BoxShape.circle,
           ),
           clipBehavior: Clip.antiAlias,
-          child: _profileImage != null
-              ? Image.file(_profileImage!, fit: BoxFit.cover)
-              : const Icon(Icons.person, color: Colors.white, size: 60),
+          child: photoWidget,
         ),
         Positioned(
           bottom: 0,
@@ -284,7 +350,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             label,
             style: const TextStyle(
               fontWeight: FontWeight.w600,
-              color: Color(0xFF212121), // Dark label text
+              color: Color(0xFF212121),
             ),
           ),
         ),
@@ -294,7 +360,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             borderRadius: BorderRadius.circular(8),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -307,7 +373,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             maxLines: maxLines,
             validator: validator,
             decoration: InputDecoration(
-              hintText: "Enter $label",
+              hintText: 'Enter $label',
               hintStyle: const TextStyle(color: Colors.grey),
               filled: true,
               fillColor: Colors.white,

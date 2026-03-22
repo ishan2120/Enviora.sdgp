@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../utils/api_config.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -18,6 +24,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
 
   @override
   void dispose() {
@@ -26,7 +33,84 @@ class _RegisterPageState extends State<RegisterPage> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _addressController.dispose();
     super.dispose();
+  }
+
+  Future<void> _registerUser() async {
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Passwords do not match'),
+            backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    try {
+      final userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      final user = userCredential.user;
+      if (user != null) {
+        // Save user profile to Firestore
+        await FirebaseFirestore.instance.collection('user').doc(user.uid).set({
+          'uid': user.uid,
+          'name': _nameController.text.trim(),
+          'email': _emailController.text.trim(),
+          'mobile': _mobileController.text.trim(),
+          'address': _addressController.text.trim(),
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        // Register user in MySQL backend
+        try {
+          final response = await http.post(
+            Uri.parse('${ApiConfig.baseUrl}/dashboard/auth/register'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'name': _nameController.text.trim(),
+              'email': _emailController.text.trim(),
+              'password': _passwordController.text.trim(),
+              'phone': _mobileController.text.trim(),
+              'address': _addressController.text.trim(),
+            }),
+          );
+          if (response.statusCode != 200 && response.statusCode != 201) {
+            print('Backend register error: ${response.body}');
+          }
+        } catch (e) {
+             print('Backend save failed: $e');
+        }
+
+        if (mounted) {
+          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        String message = 'An error occurred. Please try again.';
+        if (e.code == 'weak-password') {
+          message = 'The password provided is too weak.';
+        } else if (e.code == 'email-already-in-use') {
+          message = 'The account already exists for that email.';
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Error: ${e.toString()}'),
+              backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   @override
@@ -92,6 +176,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 16),
 
+                // Address Field
+                _buildLabel('Street/Lane Address'),
+                _buildTextField(controller: _addressController, hint: 'e.g., Hampden Lane'),
+                const SizedBox(height: 16),
+
+
                 // Email Field
                 _buildLabel('Email'),
                 _buildTextField(
@@ -133,12 +223,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: () {
-                      // TODO: Navigate to verification or home
-                      print('Registering user...');
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, '/language', (route) => false);
-                    },
+                    onPressed: _registerUser,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF48702E), // Dark green
                       foregroundColor: Colors.white,
@@ -225,7 +310,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   boxShadow: _selectedTab == 0
                       ? [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
@@ -259,7 +344,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   boxShadow: _selectedTab == 1
                       ? [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
