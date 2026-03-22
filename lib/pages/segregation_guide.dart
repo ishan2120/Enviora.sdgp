@@ -585,7 +585,7 @@ class _SegregationGuideScreenState extends State<SegregationGuideScreen> {
     );
   }
 
-  // ── Did You Know ───────────────────────────────────────────
+  // ── Did You Know ─────────
 
   Widget _buildTipCard() {
     return GestureDetector(
