@@ -138,7 +138,7 @@ class _MyReportsPageState extends State<MyReportsPage> {
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('reports')
-                  .where('userNumber', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+                  .where('userId', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
