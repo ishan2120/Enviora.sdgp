@@ -81,7 +81,7 @@ class WelcomePage extends StatelessWidget {
                       // Get Started button
                       _buildGetStartedButton(context),
 
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
 
                       // Login link
                       _buildLoginLink(context),
@@ -219,7 +219,7 @@ class WelcomePage extends StatelessWidget {
             color: index == 0
                 ? const Color(0xFF66BB6A)
                 : const Color(0xFFB2DFDB),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(9),
           ),
         ),
       ),
