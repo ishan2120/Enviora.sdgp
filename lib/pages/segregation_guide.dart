@@ -49,7 +49,7 @@ class _SegregationGuideScreenState extends State<SegregationGuideScreen> {
     super.dispose();
   }
 
-  // ── Loaders ────────────────────────────────────────────────
+  // ── Loaders ───────────────────────────────
 
   Future<void> _loadCategories() async {
     setState(() {
@@ -80,7 +80,7 @@ class _SegregationGuideScreenState extends State<SegregationGuideScreen> {
     } catch (_) {}
   }
 
-  // ── Search ─────────────────────────────────────────────────
+  // ── Search ───────────
 
   void _onSearchChanged(String value) {
     _debounce?.cancel();
@@ -143,7 +143,7 @@ class _SegregationGuideScreenState extends State<SegregationGuideScreen> {
     }
   }
 
-  // ══════════════════════════════════════════════════════════
+
   // BUILD
   // ══════════════════════════════════════════════════════════
 
@@ -249,7 +249,7 @@ class _SegregationGuideScreenState extends State<SegregationGuideScreen> {
     );
   }
 
-  // ── Search Bar ─────────────────────────────────────────────
+  // ── Search Bar ────────
 
   Widget _buildSearchBar() {
     return Container(
@@ -278,7 +278,7 @@ class _SegregationGuideScreenState extends State<SegregationGuideScreen> {
     );
   }
 
-  // ── Categories Grid ────────────────────────────────────────
+  // ── Categories Grid ─────────────
 
   Widget _buildCategoriesGrid() {
     if (_categoriesLoading) {
@@ -426,8 +426,7 @@ class _SegregationGuideScreenState extends State<SegregationGuideScreen> {
     );
   }
 
-  // ── Search View ────────────────────────────────────────────
-
+  // ── Search View ─────────────
   Widget _buildSearchView() {
     return Column(
       children: [
@@ -586,7 +585,7 @@ class _SegregationGuideScreenState extends State<SegregationGuideScreen> {
     );
   }
 
-  // ── Did You Know ───────────────────────────────────────────
+  // ── Did You Know ─────────
 
   Widget _buildTipCard() {
     return GestureDetector(
