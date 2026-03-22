@@ -21,7 +21,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   void dispose() {
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
-    
+    super.dispose();
   }
 
   Future<void> _changePassword() async {
