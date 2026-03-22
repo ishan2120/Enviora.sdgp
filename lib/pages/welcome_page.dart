@@ -219,7 +219,7 @@ class WelcomePage extends StatelessWidget {
             color: index == 0
                 ? const Color(0xFF66BB6A)
                 : const Color(0xFFB2DFDB),
-            borderRadius: BorderRadius.circular(9),
+            borderRadius: BorderRadius.circular(4),
           ),
         ),
       ),
