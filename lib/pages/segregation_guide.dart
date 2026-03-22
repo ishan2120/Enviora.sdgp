@@ -143,7 +143,7 @@ class _SegregationGuideScreenState extends State<SegregationGuideScreen> {
     }
   }
 
-  // ══════════════════════════════════════════════════════════
+
   // BUILD
   // ══════════════════════════════════════════════════════════
 
