@@ -28,7 +28,9 @@ class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
     super.initState();
     _fetchSchedule();  // Load schedule data when the page first opens
   }
-
+  /// Fetches the user's collection schedule from the API.
+  /// Uses the current Firebase Auth user's email to identify them.
+  /// Falls back to an error message if the request fails.
   Future<void> _fetchSchedule() async {
     try {
       setState(() {
