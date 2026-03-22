@@ -76,7 +76,7 @@ class WelcomePage extends StatelessWidget {
                       const SizedBox(height: 24),
 
                       // Remove pagination dots here as requested
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 32),
 
                       // Get Started button
                       _buildGetStartedButton(context),
