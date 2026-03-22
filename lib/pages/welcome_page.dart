@@ -114,7 +114,20 @@ class WelcomePage extends StatelessWidget {
                 const Icon(Icons.park, size: 40, color: Colors.green),
           ),
         ),
-  
+        const SizedBox(width: 8),
+        // App name and tagline
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text(
+              'Enviora',
+              style: TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF384132),
+                fontFamily: 'Lisu Bosa',
+              ),
+            ),
             Text(
               'Your route to a cleaner city',
               style: TextStyle(fontSize: 10, color: Color(0xFF384132)),
