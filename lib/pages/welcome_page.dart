@@ -151,28 +151,7 @@ class WelcomePage extends StatelessWidget {
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Replace this with your actual image
-            Image.asset(
-              'assets/images/welcomecityimge.png',
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                // Placeholder if image is not found
-                return Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        const Color(0xFF81C784),
-                        const Color(0xFF66BB6A),
-                      ],
-                    ),
-                  ),
+
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
