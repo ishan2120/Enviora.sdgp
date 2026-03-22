@@ -124,7 +124,7 @@ class _CollectionSchedulePageState extends State<CollectionSchedulePage> {
               ),
             ),
 
-            SizedBox(height: 16),
+            SizedBox(height: 20),
 
             // Week days row
             SizedBox(
