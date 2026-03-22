@@ -17,6 +17,6 @@ module.exports = (req, res, next) => {
     req.user = decoded; // saves user info for the next step
     next();
   } catch (err) {
-    return res.status(401).json({ success: false, message: 'Invalid or expired token.' });
+    return res.status(401).json({ success: false, message: 'Invalid .' });
   }
 };
