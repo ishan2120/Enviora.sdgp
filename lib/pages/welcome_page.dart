@@ -12,7 +12,7 @@ class WelcomePage extends StatelessWidget {
         children: [
           // Background image with 50% opacity
           Opacity(
-            opacity: 0.7,
+            opacity: 0.5,
             child: Container(
               width: double.infinity,
               height: double.infinity,
