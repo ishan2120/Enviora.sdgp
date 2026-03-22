@@ -49,7 +49,7 @@ class _SegregationGuideScreenState extends State<SegregationGuideScreen> {
     super.dispose();
   }
 
-  // ── Loaders ────────────────────────────────────────────────
+  // ── Loaders ───────────────────────────────
 
   Future<void> _loadCategories() async {
     setState(() {
