@@ -138,7 +138,7 @@ class _TrackVehiclePageState extends State<TrackVehiclePage> {
           title: 'Truck ${vehicle.vehicleId}',
           snippet: vehicle.currentLocation,
         ),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        
       ),
     };
 
