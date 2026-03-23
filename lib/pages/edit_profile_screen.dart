@@ -102,7 +102,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           .doc(user.uid)
           .set({
         'name': newName,
-        
+        'email': _emailController.text.trim(),
         'photoPath': photoPath,
       }, SetOptions(merge: true));
 
