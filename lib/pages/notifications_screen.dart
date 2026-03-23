@@ -280,7 +280,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   height: 8,
                   decoration: const BoxDecoration(
                     color: Color(0xFF4CAF50),
-                    shape: BoxShape.circle,
+                    
                   ),
                 ),
             ],
