@@ -524,7 +524,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     const SizedBox(height: 24),
 
-                    // Daily Eco Tip
+                    // Daily Eco Tip in dashboard
                     const Text(
                       'Daily Eco Tip',
                       style: TextStyle(
