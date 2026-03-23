@@ -103,7 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       _buildSectionHeader(
                           'Activity History'), // Or custom implementation for this one with subtitle
                       _buildActivityHistoryItem(context),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 27),
 
                       // Preferences
                       _buildSectionHeader('Preferences'),
