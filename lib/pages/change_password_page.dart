@@ -17,12 +17,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   bool _obscureConfirm = true;
   bool _isLoading = false;
 
-  @override
-  void dispose() {
-    _newPasswordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
+  
 
   Future<void> _changePassword() async {
     final newPass = _newPasswordController.text.trim();
