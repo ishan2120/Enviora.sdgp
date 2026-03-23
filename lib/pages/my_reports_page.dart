@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/custom_bottom_nav.dart';
 import '../models/models.dart';
 import 'file_complaint_page.dart';
@@ -16,63 +18,11 @@ class _MyReportsPageState extends State<MyReportsPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  // Sample data
-  final List<Report> _allReports = [
-    Report(
-      id: 'EV-7712',
-      type: ReportType.illegalDumping,
-      issueType: 'Illegal Waste Dumping',
-      description: 'Large pile of garbage bags dumped on the street',
-      status: ReportStatus.pending,
-      reportedDate: DateTime(2024, 10, 12),
-      imageUrl: 'assets/images/Rectangle 117.png',
-    ),
-    Report(
-      id: 'EV-7740',
-      type: ReportType.missedCollection,
-      issueType: 'Overflowing Bin',
-      description: 'Bins are overflowing and not collected',
-      status: ReportStatus.inProgress,
-      reportedDate: DateTime(2024, 9, 28),
-      imageUrl: 'assets/images/Rectangle 118.png',
-    ),
-    Report(
-      id: 'EV-7891',
-      type: ReportType.illegalDumping,
-      issueType: 'Illegal Waste Dumping',
-      description: 'Waste dumped near residential area',
-      status: ReportStatus.resolved,
-      reportedDate: DateTime(2024, 10, 12),
-      imageUrl: 'assets/images/Rectangle 117.png',
-    ),
-  ];
 
-  final SupervisorUpdate _latestUpdate = SupervisorUpdate(
-    supervisorName: 'Supervisor Thasara',
-    message:
-        'We have dispatched a collection team to #EV-7740. You should see it cleared within the next 48 hours.',
-    timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-  );
 
-  List<Report> get _filteredReports {
-    var reports = _allReports;
 
-    // Filter by status
-    if (_selectedFilter != null) {
-      reports = reports.where((r) => r.status == _selectedFilter).toList();
-    }
 
-    // Filter by search query
-    if (_searchQuery.isNotEmpty) {
-      reports = reports.where((r) {
-        return r.id.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            r.typeString.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            r.issueType.toLowerCase().contains(_searchQuery.toLowerCase());
-      }).toList();
-    }
 
-    return reports;
-  }
 
   @override
   void dispose() {
@@ -185,18 +135,62 @@ class _MyReportsPageState extends State<MyReportsPage> {
 
           // Reports List
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount:
-                  _filteredReports.length + 1, // +1 for latest update section
-              itemBuilder: (context, index) {
-                if (index == _filteredReports.length) {
-                  // Latest Update Section
-                  return _LatestUpdateCard(update: _latestUpdate);
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('reports')
+                  .where('userId', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
                 }
 
-                final report = _filteredReports[index];
-                return _ReportCard(report: report);
+                final docs = snapshot.data!.docs;
+                final reports = docs.map((doc) => Report.fromFirestore(doc)).toList();
+
+                // Sort in memory
+                reports.sort((a, b) => b.reportedDate.compareTo(a.reportedDate));
+
+                // Apply filters in memory
+                final filteredReports = reports.where((r) {
+                  // Filter by status
+                  if (_selectedFilter != null && r.status != _selectedFilter) {
+                    return false;
+                  }
+                  // Filter by search query
+                  if (_searchQuery.isNotEmpty) {
+                    final query = _searchQuery.toLowerCase();
+                    return r.id.toLowerCase().contains(query) ||
+                        r.typeString.toLowerCase().contains(query) ||
+                        r.issueType.toLowerCase().contains(query);
+                  }
+                  return true;
+                }).toList();
+
+                if (filteredReports.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.assignment_outlined, size: 64, color: Colors.grey[300]),
+                        const SizedBox(height: 16),
+                        const Text('No reports found', style: TextStyle(color: Colors.grey)),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemCount: filteredReports.length,
+                  itemBuilder: (context, index) {
+                    final report = filteredReports[index];
+                    return _ReportCard(report: report);
+                  },
+                );
               },
             ),
           ),
@@ -292,7 +286,7 @@ class _ReportCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 8,
             offset: const Offset(0, 2),
@@ -337,6 +331,23 @@ class _ReportCard extends StatelessWidget {
                   'Reported on ${DateFormat('MMM dd').format(report.reportedDate)} #${report.id}',
                   style: TextStyle(fontSize: 14, color: Colors.green[600]),
                 ),
+                if (report.location != null && report.location!.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.location_on_outlined, size: 14, color: Colors.grey[600]),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          report.location!,
+                          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 12),
                 GestureDetector(
                   onTap: () {
@@ -403,98 +414,4 @@ class _ReportCard extends StatelessWidget {
   }
 }
 
-class _LatestUpdateCard extends StatelessWidget {
-  final SupervisorUpdate update;
 
-  const _LatestUpdateCard({required this.update});
-
-  String _getTimeAgo(DateTime timestamp) {
-    final difference = DateTime.now().difference(timestamp);
-    if (difference.inHours < 1) {
-      return '${difference.inMinutes} minutes ago';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours} hours ago';
-    } else {
-      return '${difference.inDays} days ago';
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 24, bottom: 100),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'LATEST UPDATE',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF4CAF50),
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE8F5E9),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const CircleAvatar(
-                      radius: 20,
-                      backgroundColor: Color(0xFF4CAF50),
-                      child: Icon(
-                        Icons.person,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            update.supervisorName,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Text(
-                            _getTimeAgo(update.timestamp),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  update.message,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black87,
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

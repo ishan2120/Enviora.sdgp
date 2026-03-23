@@ -1,10 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'pages/language_selection_page.dart';
 import 'pages/welcome_page.dart';
 import 'pages/login_page.dart';
 import 'pages/register_page.dart';
+import 'pages/forgot_password_page.dart';
+import 'supervisor/pages/supervisor_login_page.dart';
+import 'supervisor/pages/supervisor_dashboard.dart';
+import 'supervisor/widgets/supervisor_auth_guard.dart';
+import 'pages/dashboard.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Standard initialization for Android/iOS with service files
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    debugPrint('Firebase Initialization Error: $e');
+  }
+
   runApp(const EnvioraApp());
 }
 
@@ -33,7 +48,7 @@ class _EnvioraAppState extends State<EnvioraApp> {
       supportedLocales: const [
         Locale('en'),
         Locale('si'),
-        Locale('ta'),
+        Locale('tam'),
       ],
       theme: ThemeData(
         primarySwatch: Colors.green,
@@ -48,6 +63,10 @@ class _EnvioraAppState extends State<EnvioraApp> {
         '/register': (context) => const RegisterPage(),
         '/language': (context) =>
             LanguageSelectionPage(onLanguageSelected: _setLocale),
+        '/home': (context) => const HomeScreen(),
+        '/forgot-password': (context) => const ForgotPasswordPage(),
+        '/supervisor-login': (context) => const SupervisorLoginPage(),
+        '/supervisor-home': (context) => const SupervisorAuthGuard(child: SupervisorDashboard()),
       },
     );
   }
