@@ -159,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         MaterialPageRoute(
                             builder: (_) => const ProfileScreen()),
                       );
-                      // Refresh data when returning from profile
+                      // Refresh data
                       _loadUserData();
                     },
                     child: Container(
