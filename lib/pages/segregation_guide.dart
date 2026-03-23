@@ -165,7 +165,7 @@ class _SegregationGuideScreenState extends State<SegregationGuideScreen> {
     );
   }
 
-  // ── App Bar ────────────────────────────────────────────────
+  // ── App Bar ─────────
 
   Widget _buildAppBar() {
     return Container(
