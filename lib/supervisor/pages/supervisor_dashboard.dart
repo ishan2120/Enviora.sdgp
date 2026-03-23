@@ -161,7 +161,16 @@ class _DashboardOverview extends StatelessWidget {
     );
   }
 
- 
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        color: Color(0xFF2E3E32),
+      ),
+    );
+  }
 
   Widget _buildQuickActionGrid(BuildContext context) {
     return Row(
