@@ -652,7 +652,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
 
                     const SizedBox(
-                        height: 80), // Extra space for bottom navigation
+                        height: 80),
                   ],
                 ),
               ),
