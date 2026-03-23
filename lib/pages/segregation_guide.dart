@@ -198,7 +198,7 @@ class _SegregationGuideScreenState extends State<SegregationGuideScreen> {
     );
   }
 
-  // ── Main View ──────────────────────────────────────────────
+  // ── Main View ────────────────
 
   Widget _buildMainView() {
     return SingleChildScrollView(
