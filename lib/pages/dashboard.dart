@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final schedules = await apiService.getMySchedule(email: user.email);
         
         if (schedules.isNotEmpty) {
-          // Sort logically if backend hasn't (assuming date format is YYYY-MM-DD)
+          // Sort logically if backend hasn't (assuming format is YYYY-MM-DD)
           schedules.sort((a, b) => a.date.compareTo(b.date));
           
           final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
