@@ -102,7 +102,7 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
                       
                       // Map Firestore data to ActivityItem or similar UI
                       final item = ActivityItem(
-                        id: doc.id,
+                        
                         title: '${data['reportType'] ?? 'Waste'} Report',
                         subtitle: data['location'] ?? 'Location not provided',
                         date: _formatDate(data['reportedDate']),
