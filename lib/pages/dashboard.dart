@@ -195,9 +195,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'GOOD MORNING',
-                          style: TextStyle(
+                        Text(
+                          () {
+                            final hour = DateTime.now().hour;
+                            if (hour < 12) return 'GOOD MORNING';
+                            if (hour < 17) return 'GOOD AFTERNOON';
+                            return 'GOOD EVENING';
+                          }(),
+                          style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w500,
                             color: Color(0xFF666666),
